@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "engine": "kitchen-v2",
+  "seed": "studio-042",
+  "size": 32,
+  "kind": "goblin",
+  "palette": [
+    "#25362f",
+    "#356653",
+    "#5b9c72",
+    "#94c982",
+    "#d8edaa",
+    "#fff6db",
+    "#202532",
+    "#efb16f"
+  ],
+  "body": 50,
+  "detail": 20,
+  "eyes": 2,
+  "horns": false,
+  "outline": true,
+  "symmetry": true,
+  "view": {
+    "engine": "kitchen-view-v2",
+    "direction": "front"
+  }
+}

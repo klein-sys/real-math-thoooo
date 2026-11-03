@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "engine": "kitchen-v2",
+  "seed": "studio-042",
+  "size": 32,
+  "kind": "slime",
+  "palette": [
+    "#233342",
+    "#2f5e79",
+    "#468fa6",
+    "#81c7c6",
+    "#c2e9dd",
+    "#fff5dc",
+    "#223047",
+    "#f3adbb"
+  ],
+  "body": 55,
+  "detail": 20,
+  "eyes": 2,
+  "horns": false,
+  "outline": true,
+  "symmetry": true,
+  "view": {
+    "engine": "kitchen-view-v2",
+    "direction": "right"
+  },
+  "animation": {
+    "engine": "kitchen-motion-v3",
+    "state": "idle",
+    "fps": 4,
+    "direction": "right"
+  }
+}

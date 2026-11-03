@@ -1,0 +1,67 @@
+/* Explorer's Edition: restrained fantasy chrome around the pixel-art world. */
+:root { --bg-dark:#0e171c; --bg-panel:#172329; --bg-card:#213036; --border-color:#3d4b4b; --primary:#d2b77f; --text-main:#eee9db; --text-muted:#acb5ac; }
+body { background:radial-gradient(ellipse at 50% 0,#26362e 0,#101b20 55%,#0a1318 100%); color:var(--text-main); min-height:100vh; }
+#game-container { max-width:1160px; padding:24px 24px 32px; gap:0; }
+.game-masthead { display:flex; align-items:center; justify-content:space-between; padding:0 4px 22px; gap:12px; }
+.eyebrow { display:block; font:600 9px 'JetBrains Mono',monospace; letter-spacing:2px; color:#c4ad7b; }
+h1 { font-family:Georgia,serif; font-size:34px; letter-spacing:0.4px; font-weight:normal; line-height:1.2; margin-top:6px; color:#f0e8d5; }
+h1 span { display:block; margin-top:9px; font:500 9px 'JetBrains Mono',monospace; letter-spacing:2px; color:#8ca39b; }
+.edition-mark { font:9px monospace; letter-spacing:2px; color:#899b91; border:1px solid #64736366; padding:9px 12px; }
+.top-bar { background:#1b282bd9; border:1px solid #59634c66; border-bottom:0; border-radius:10px 10px 0 0; box-shadow:none; padding:13px 18px; gap:12px; }
+.hero-avatar { border-color:#b8a77a66; background:#3c4636; border-radius:50%; width:40px;height:40px; }
+.hero-avatar { background-image:url('assets/game/kiro_2.0/spritesheets/spr_kiro2_0_idle_strip35.png');background-size:2240px 64px;background-position:-12px -12px;color:transparent;image-rendering:pixelated; }
+.hero-name { font-family:Georgia,serif; font-size:19px; }
+.btn { border-radius:5px; background:#263431; border-color:#536152; color:#e0e5d6; font-size:11px; box-shadow:none; }
+.btn:hover { background:#35463d; border-color:#b7a16d; transform:translateY(-1px); }
+.btn-primary { color:#18251f; background:#cdb27b; border-color:#dbc38d; }
+.btn-primary:hover { background:#e1cb99; color:#18251f; }
+.btn-accent { color:#e8c98a; border-color:#96805277; background:#4a422966; }
+.btn-math { background:#253a40; border-color:#567177; color:#b7d7d7; }
+.badge-level { background:#455540; color:#e7d9aa; }
+.tag-chip { border-radius:4px; font-size:10px; }
+.quest-banner { border:1px solid #59634c66; border-radius:0; background:#202d29; padding:11px 18px; box-shadow:none; }
+.quest-title { font-size:11px; gap:8px; }.quest-desc { font-size:12px; }
+.viewport-card { border:1px solid #59634c66; border-top:0; border-radius:0 0 10px 10px; background:#162424; padding:8px; box-shadow:0 20px 65px #0006; overflow:hidden; }
+#canvas-wrapper { position:relative; border:0; width:100%; overflow:hidden; border-radius:3px; background:#122221; }
+#gameCanvas { display:block; width:100%; height:auto; aspect-ratio:3/2; image-rendering:pixelated; touch-action:none; }
+.location-plaque { position:absolute; top:17px;left:18px;display:flex;flex-direction:column;gap:5px;pointer-events:none; text-shadow:0 2px 5px #000; background:linear-gradient(90deg,#142224e8,#14222400); padding:11px 40px 12px 12px; border-left:2px solid #bcaa72; }
+.location-plaque strong { font:22px Georgia,serif; color:#fff0cd; }.location-plaque>span:last-child { font-size:10px; color:#cfdbc7; }
+.location-plaque .eyebrow { font-size:8px;letter-spacing:1.4px; }
+.touch-controls { position:absolute; inset:0; pointer-events:none; }
+#joystick { width:116px;height:116px;position:absolute;bottom:24px;left:25px;pointer-events:auto;touch-action:none;border-radius:50%;background:#0c242b59;border:1px solid #ede1b438;box-shadow:inset 0 0 24px #0e151f44; }
+.joystick-ring { position:absolute;inset:15px;border:1px dashed #d5d7ba44;border-radius:50%;pointer-events:none; }
+#joystick-knob { position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:43px;height:43px;border-radius:50%;border:1px solid #dace9b8c;background:radial-gradient(circle at 35% 30%,#8f9b7999,#3c5559c9);box-shadow:0 3px 12px #0005;pointer-events:none; }
+.interact-button { position:absolute;bottom:42px;right:30px;width:78px;height:78px;border:1px solid #e5d19b99;border-radius:50%;background:#304a43b8;color:#f2dfb7;font:600 12px Outfit,sans-serif;pointer-events:auto;touch-action:manipulation;box-shadow:0 4px 20px #0005;cursor:pointer; }
+.interact-button:active { background:#a68f5c;transform:scale(.96); }
+#interact-toast { position:absolute;bottom:24px;top:auto;left:50%;transform:translateX(-50%);max-width:calc(100% - 310px);padding:9px 13px;border:1px solid #d1bc7c66;border-radius:5px;color:#f1e6c9;background:#16292dea;font-size:12px;cursor:pointer;box-shadow:0 2px 12px #0005; }
+.explore-footer { padding:12px 10px 5px;display:flex;justify-content:space-between;gap:8px;font:10px Outfit,sans-serif;color:#8ea296; }
+.modal-overlay { background:#061015cf;backdrop-filter:blur(7px);padding:16px; }
+.modal-box { background:linear-gradient(145deg,#22322f,#16242c);border:1px solid #8a805766;border-radius:12px;box-shadow:0 24px 100px #000a; }
+.modal-title { color:#ecddb8; }.modal-header { border-color:#a29b6c33; }
+.proof-card,.proof-step,.telemetry-tile,.forge-slider-box { background:#11242a88;border-color:#72806a44; }
+.battle-heading { display:flex;gap:8px;flex-direction:column;margin-bottom:16px; }.battle-heading strong { font:28px Georgia,serif;color:#f0dfba; }.battle-heading>span:last-child { color:#adbcac;font-size:12px; }
+#battle-scene { display:block;width:100%;height:auto;border:1px solid #7d825744;border-radius:6px;image-rendering:pixelated; }
+.battle-header { padding:14px 0 6px;align-items:center; }.combatant-card { flex:1;gap:5px;background:transparent;border:0;padding:4px 0; }
+.combatant-sprite { display:none!important; }.combatant-name { font:17px Georgia,serif; }.stat-bar-container { border:1px solid #68736744; }
+.battle-actions { gap:9px; }.battle-btn { border-radius:6px;font-size:15px;padding:15px 16px;min-width:0;flex:1;cursor:pointer; }
+.strike-btn { background:#82704d;border:1px solid #cbb17b;color:#fff1d0; }.potion-btn { background:#34584b;border:1px solid #638976;color:#e0edd6; }
+.run-btn { background:#35414a;border:1px solid #6f8291;color:#e3e7e9; }
+.battle-btn:disabled,.btn:disabled { opacity:.4;cursor:not-allowed;transform:none; }
+.tap-strike-btn { background:#397c68;border:1px solid #b6dbae;color:#fff6cc; }.battle-help { margin-top:12px;font-size:11px;color:#a6b6a7;line-height:1.6;text-align:center; }
+.battle-inventory { margin:12px 0;padding:12px;background:#1d3a34;border:1px solid #65836a77;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+[hidden] { display:none!important; }.battle-inventory>div { display:flex;align-items:center;gap:8px;flex:1; }.battle-inventory img { width:42px;height:42px;image-rendering:pixelated; }.battle-inventory small { display:block;font-size:11px;color:#bdc9b7;margin-top:3px; }
+.combat-log { max-height:90px;height:90px;font-size:12px;background:#101e25; }.timing-section { padding:12px 0; }.gauge-track-container { height:26px; }.gauge-sweet-spot { font-size:9px; }
+.battle-report { max-width:650px; }.battle-report h2 { font:36px Georgia,serif;color:#e6d3a3;margin:12px 0 6px; }.battle-report>p { color:#b7c5b7;font-size:14px;margin:8px 0; }
+.report-rewards { padding:17px 0;font:22px Georgia,serif;color:#d9c18a; }.report-actions { display:flex;gap:10px;flex-wrap:wrap;margin-top:22px; }.report-actions .btn { padding:12px 18px; }
+.report-math { margin-top:24px;border-top:1px solid #a9ac6b44;padding-top:18px;line-height:1.7;font-size:13px; }.report-math p { margin-bottom:12px; }.report-math .proof-step { margin-top:10px;padding:12px; }
+@media(max-width:700px) {
+  #game-container {padding:10px 6px 16px;}.game-masthead {padding:6px 7px 15px;}h1 {font-size:26px;}.edition-mark {display:none;}.eyebrow {font-size:8px;letter-spacing:1.5px;}
+  .top-bar {padding:10px;gap:10px;}.top-actions {gap:5px;flex-wrap:wrap;}.top-actions .btn {font-size:10px;padding:7px 8px;}.quest-banner {padding:10px;}.quest-title>span:first-child {display:none;}.quest-desc {font-size:11px;}
+  #ui-boss-badge {display:none;}.viewport-card {padding:4px;}#gameCanvas {aspect-ratio:1/1;}
+  .location-plaque {top:9px;left:8px;padding:8px 14px 8px 8px;}.location-plaque strong {font-size:17px;}.location-plaque>span:last-child {display:none;}
+  #joystick {width:96px;height:96px;left:15px;bottom:15px;}#joystick-knob {width:38px;height:38px;}.interact-button {width:64px;height:64px;bottom:30px;right:16px;font-size:11px;}
+  #interact-toast {bottom:16px;max-width:calc(100% - 195px);font-size:10px;padding:7px 8px;}.explore-footer {font-size:9px;}.explore-footer>span:last-child {display:none;}
+  .modal-overlay {padding:8px;}.modal-box {padding:16px;max-height:94vh;}.battle-heading {gap:4px;margin-bottom:10px;}.battle-heading strong {font-size:24px;}.battle-btn {font-size:13px;padding:12px 9px;}.combatant-name {font-size:14px;}.battle-help {font-size:10px;}.combat-log {height:70px;max-height:70px;}
+  .telemetry-grid {grid-template-columns:repeat(2,1fr);}.forge-split-row {font-size:12px;}.location-plaque {max-width:60%;}
+}
+@media(prefers-reduced-motion:reduce) { .modal-box,.btn {animation:none;transition:none;} }

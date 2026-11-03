@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Derivative Quest — MATH 101 Semester Project Documentation</title>
+  <!-- KaTeX for crisp academic math typesetting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  "></script>
+  <style>
+    /* Executive Academic Document Styling */
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+      @bottom-right {
+        content: counter(page);
+        font-size: 9pt;
+        color: #64748b;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.55;
+      color: #1e293b;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Print & Page Break Rules */
+    @media print {
+      body {
+        width: 100%;
+        background: transparent;
+      }
+      .page-break-before {
+        page-break-before: always;
+      }
+      .no-break {
+        page-break-inside: avoid;
+      }
+      h1, h2, h3 {
+        page-break-after: avoid;
+      }
+      pre, table, .callout, .proof-box {
+        page-break-inside: avoid;
+      }
+    }
+
+    /* Cover Page */
+    .cover-page {
+      padding: 40px 10px 20px 10px;
+      text-align: center;
+      page-break-after: always;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .badge-header {
+      display: inline-block;
+      font-size: 8.5pt;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #0284c7;
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 28pt;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.15;
+      margin: 12px 0 8px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .cover-subtitle {
+      font-size: 13.5pt;
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .cover-divider {
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #0284c7, #3b82f6);
+      margin: 0 auto 30px auto;
+      border-radius: 2px;
+    }
+
+    .meta-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px 24px;
+      text-align: left;
+      margin: 0 auto 24px auto;
+      max-width: 620px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      font-size: 9.5pt;
+    }
+
+    .meta-label {
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .meta-value {
+      color: #0f172a;
+    }
+
+    .meta-value a {
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .abstract-box {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      text-align: left;
+      font-size: 9pt;
+      color: #14532d;
+      max-width: 620px;
+      margin: 0 auto 20px auto;
+      line-height: 1.5;
+    }
+
+    .cover-footer {
+      font-size: 8.5pt;
+      color: #94a3b8;
+      margin-top: 20px;
+    }
+
+    /* Headings */
+    h1.section-title {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 2px solid #0284c7;
+      padding-bottom: 6px;
+      margin-top: 32px;
+      margin-bottom: 14px;
+      page-break-before: always;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* First h1 on page 2 doesn't need double break */
+    .content-start h1:first-of-type {
+      page-break-before: avoid;
+    }
+
+    h2 {
+      font-size: 12.5pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-top: 22px;
+      margin-bottom: 8px;
+      border-left: 3.5px solid #3b82f6;
+      padding-left: 8px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+
+    h4 {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #475569;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin-top: 4px;
+      margin-bottom: 12px;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      margin: 14px 0;
+      overflow-x: auto;
+      page-break-inside: avoid;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #0f172a;
+      color: #f8fafc;
+      font-weight: 700;
+      padding: 7px 10px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+
+    td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+      vertical-align: top;
+    }
+
+    tr.alt {
+      background: #f8fafc;
+    }
+
+    /* Code & Pre */
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 8pt;
+      line-height: 1.45;
+      overflow-x: auto;
+      margin: 12px 0;
+      border: 1px solid #1e293b;
+      page-break-inside: avoid;
+      white-space: pre-wrap;
+    }
+
+    code.inline-code {
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 8.5pt;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Callouts & Notes */
+    .callout {
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 9pt;
+      page-break-inside: avoid;
+    }
+
+    .callout-info {
+      background: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      color: #0c4a6e;
+    }
+
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #78350f;
+    }
+
+    .math-block {
+      margin: 12px 0;
+      text-align: center;
+      page-break-inside: avoid;
+      padding: 6px 0;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 20px 0;
+    }
+
+    strong {
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page">
+    <div>
+      <div class="badge-header">MATH 101 DIFFERENTIAL CALCULUS &bull; SEMESTER PROJECT</div>
+      <div class="cover-title">Derivative Quest</div>
+      <div class="cover-subtitle">Complete Project Documentation & Technical Specification</div>
+      <div class="cover-divider"></div>
+
+      <div class="meta-card">
+        <div class="meta-grid">
+          <div class="meta-label">Academic Subject:</div>
+          <div class="meta-value">MATH 101 – Differential Calculus</div>
+
+          <div class="meta-label">Calculus Concepts:</div>
+          <div class="meta-value">Single-Variable Optimization, Critical Points, Concavity, Inflection Points, Instantaneous Rate of Change</div>
+
+          <div class="meta-label">Software Platform:</div>
+          <div class="meta-value">Interactive HTML5 Canvas & Web Audio (Single-Page App)</div>
+
+          <div class="meta-label">Target Deployment:</div>
+          <div class="meta-value">Web Browsers (Desktop keyboard & Mobile touch)</div>
+
+          <div class="meta-label">GitHub Repository:</div>
+          <div class="meta-value"><a href="https://github.com/klein-sys/math">github.com/klein-sys/math</a></div>
+
+          <div class="meta-label">Project Team:</div>
+          <div class="meta-value">5-Member Student Collaborative Group</div>
+
+          <div class="meta-label">Publication Date:</div>
+          <div class="meta-value">Semester Final Defense — 2026</div>
+        </div>
+      </div>
+
+      <div class="abstract-box">
+        <strong>Executive Project Abstract:</strong><br>
+        <em>Derivative Quest</em> is a fully functional, playable digital role-playing game where differential calculus principles are implemented directly as the core gameplay and combat physics engine. Weapon strike power is governed analytically by cubic optimization ($D(x) = x^2(10-x)$), and battle gauge timing rewards strikes at the mathematical inflection point ($R''(t)=0$) of a logistic S-curve ($R(t)$). This document presents complete mathematical proofs, game design specifications, monster AI movement mechanics, combat debuff matrices, and system architecture blueprints.
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      MATH 101 Differential Calculus &bull; Technical Specification Manual &bull; Fully Documented & Verified
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="content-start">
+    <h1 class="section-title">Derivative Quest: Complete Project Documentation & Technical Specification</h1>
+<h2>MATH 101 – Differential Calculus Semester Project</h2>
+<p><strong>Project Title:</strong> Derivative Quest — Differential Calculus Story RPG  </p>
+<p><strong>Course:</strong> MATH 101 (Differential Calculus)  </p>
+<p><strong>Target Platform:</strong> Web Browser (Desktop & Mobile, Responsive HTML5 Canvas)  </p>
+<p><strong>GitHub Repository:</strong> <a href="https://github.com/klein-sys/math">https://github.com/klein-sys/math</a>  </p>
+<p><strong>Primary Calculus Applications:</strong> </p>
+<ol>
+<li><strong>Optimization</strong> via Critical Points & Second Derivative Test ($D(x) = x^2(10 - x)$)</li>
+<li><strong>Concavity & Inflection Points</strong> via Logistic S-Curve Battle Timing ($R(t) = \frac{1}{1 + e^{-K(t - T/2)}}$)</li>
+<li><strong>Instantaneous Rates of Change</strong> ($D'(x)$ and $R'(t)$) driving combat power and gauge velocity</li>
+</ol>
+<hr>
+<h1 class="section-title">Table of Contents</h1>
+<ol>
+<li><a href="#1-executive-summary--game-introduction">Executive Summary & Game Introduction</a></li>
+<li><a href="#2-course-rubric--academic-requirements">Course Rubric & Academic Requirements</a></li>
+<li><a href="#3-required-mechanics-checklist">Required Mechanics Checklist</a></li>
+<li><a href="#4-game-design-specification">Game Design Specification</a></li>
+</ol>
+<p>   - 4.1 Narrative & Three-Act Progression</p>
+<p>   - 4.2 7-Member Customizable Cast</p>
+<p>   - 4.3 Core Game Loop & World Map</p>
+<p>   - 4.4 Turn-Based Battle Mechanics</p>
+<p>   - 4.5 Combat Debuff Matrix</p>
+<p>   - 4.6 Monster AI & Room-Bound Patrols</p>
+<p>   - 4.7 Blacksmith Village Credit & Debt System</p>
+<ol>
+<li><a href="#5-differential-calculus-engine--formal-proofs">Differential Calculus Engine & Formal Proofs</a></li>
+</ol>
+<p>   - 5.1 The Forge: Strike Optimization Proof</p>
+<p>   - 5.2 Battle Timing: Logistic Gauge Inflection Point Proof</p>
+<p>   - 5.3 Step-by-Step Worked Defense Examples</p>
+<ol>
+<li><a href="#6-technical-architecture--system-blueprint">Technical Architecture & System Blueprint</a></li>
+</ol>
+<p>   - 6.1 Layered Software Architecture</p>
+<p>   - 6.2 Analytical CalculusEngine Implementation</p>
+<p>   - 6.3 Sprite Kitchen (kitchen-v2) Procedural Pixel Pipeline</p>
+<p>   - 6.4 Developer & Instructor Debug Panel</p>
+<ol>
+<li><a href="#7-numerical-balance-sheet--progression-constants">Numerical Balance Sheet & Progression Constants</a></li>
+<li><a href="#8-project-file-structure--deployment-guide">Project File Structure & Deployment Guide</a></li>
+</ol>
+<hr>
+<h1 class="section-title">1. Executive Summary & Game Introduction</h1>
+<p><strong>Derivative Quest</strong> is an interactive, top-down digital role-playing game developed as the capstone semester project for <strong>MATH 101 (Differential Calculus)</strong>. Unlike educational games that simply superimpose trivia or quiz cards over unrelated game loops, <em>Derivative Quest</em> implements <strong>Differential Calculus as the underlying physical and balance engine of the game</strong>.</p>
+<p>The hero's strike damage output is governed analytically by a cubic polynomial optimization curve, where finding the critical point via the first derivative ($D'(x) = 0$) and confirming the local maximum via concavity ($D''(x) < 0$) produces a demonstrable +18.5% damage bonus over naive balanced builds. Furthermore, turn-based battle execution relies on a logistic S-curve gauge where precision strike multipliers scale directly with the gauge's instantaneous rate of change ($R'(t)$), reaching peak critical efficiency (2.0× damage) at the mathematical <strong>inflection point</strong> ($R''(t) = 0$).</p>
+<p>The application runs entirely within standard web browsers (desktop and mobile) in a single-page architecture with <strong>zero compiler overhead, zero black-box physics libraries, and zero external asset dependencies</strong>, generating retro 8-bit audio through the Web Audio API and procedural 32×32 pixel sprites via the Sprite Kitchen engine.</p>
+<hr>
+<h1 class="section-title">2. Course Rubric & Academic Requirements</h1>
+<p>This project conforms strictly to the requirements outlined in the official MATH 101 Semester Project guidelines:</p>
+<h3>Core Compliance Pillars:</h3>
+<ul>
+<li><strong>Interactive Digital Format:</strong> Native client-side web application hosted in an interactive canvas environment; physical or non-interactive board games are eliminated.</li>
+<li><strong>Calculus as Game Physics (Anti-Trivia Rule):</strong> Equations are not presented as arbitrary pop-up questions. Calculus formulas directly compute runtime values: strike damage, gauge velocity, status duration scaling, and endgame academic ratings.</li>
+<li><strong>Complete Worked Examples:</strong> Thorough, step-by-step mathematical proofs showing critical point derivation, first derivative tests, and second derivative concavity verification.</li>
+<li><strong>Live Telemetry & Verification:</strong> A built-in <strong>🔬 Math View</strong> modal displays analytical equations side-by-side with live numerical readouts ($x$, $D(x)$, $D'(x)$, $D''(x)$) and real-time tangent vector visualizations.</li>
+<li><strong>Oral Defense Preparedness:</strong> Structured documentation and code architecture specifically partitioned for student presentations and instructor cross-examination.</li>
+</ul>
+<hr>
+<h1 class="section-title">3. Required Mechanics Checklist</h1>
+<div class="table-container"><table>
+<thead>
+<tr><th>Required Component</th><th>In-Game Implementation</th></tr>
+</thead>
+<tbody>
+<tr ><td><strong>Objective</strong></td><td>Train in the village outskirts, optimize strike weapon balance at the Blacksmith's Forge, break the cave seal by defeating the Stone Golem at Level 3, and slay the Ember Dragon at Level 5 to recover the village harvest.</td></tr>
+<tr class="alt"><td><strong>Platform & Players</strong></td><td>Single-player web application; fully responsive on desktop (keyboard WASD/Arrows) and mobile devices (on-screen touch D-Pad).</td></tr>
+<tr ><td><strong>Permitted Actions</strong></td><td>4-directional grid movement; talking to NPCs; initiating combat by contact; triggering the Forge optimization slider; timing gauge strikes; consuming healing potions; taking village loans.</td></tr>
+<tr class="alt"><td><strong>Prohibited Actions</strong></td><td>Traversing solid mountain boundaries; entering the Stone Golem cave prior to Level 3; confronting the Ember Dragon prior to defeating the Golem and reaching Level 5; borrowing in excess of 60 gold debt.</td></tr>
+<tr ><td><strong>Gameplay Sequence</strong></td><td>1. Village Briefing (Elder Thales) $\rightarrow$ 2. Forest Monster Training & Gold Farming $\rightarrow$ 3. Blacksmith Optimization $\rightarrow$ 4. Cave Dungeon & Golem Boss Battle $\rightarrow$ 5. Volcano Ascent & Dragon Final Confrontation $\rightarrow$ 6. Victory Calculus Evaluation.</td></tr>
+<tr class="alt"><td><strong>Winning Conditions</strong></td><td>Slaying the Ember Dragon (reducing HP from 900 to 0) during Act III. Evaluates player on build optimality ($</td><td>x - 20/3</td><td>$) and inflection strike ratio.</td></tr>
+<tr ><td><strong>Losing Conditions</strong></td><td>Player HP drops to 0 during combat. Results in fainting, respawning at the village hut, and forfeiture of 50% carried gold.</td></tr>
+<tr class="alt"><td><strong>Calculus Mechanics</strong></td><td>1. Weapon Power: $D(x) = x^2(10-x) = 10x^2 - x^3$<br>2. Rate of Change: $D'(x) = 20x - 3x^2$<br>3. Concavity Test: $D''(x) = 20 - 6x$<br>4. Gauge Curve: $R(t) = \frac{1}{1 + e^{-K(t - T/2)}}$<br>5. Inflection Point: $R''(t) = 0 \iff t = T/2$</td></tr>
+</tbody>
+</table></div>
+
+<hr>
+<h1 class="section-title">4. Game Design Specification</h1>
+<h2>4.1 Narrative & Three-Act Progression</h2>
+<p>The peaceful village of Thalesia is devastated when the <strong>Ember Dragon</strong> scorches the crops and retreats to its volcanic caldera. The mountain pass is guarded by a massive <strong>Stone Golem</strong>, whose protective ward prevents entry.</p>
+<ul>
+<li><strong>Act I (The Village):</strong> Hero awakens in the village. Elder Thales instructs the hero on combat basics and directs them to the forest slimes and the village Blacksmith.</li>
+<li><strong>Act II (The Forest & Mountain Cave):</strong> Hero hunts forest slimes and goblins, levels up to Level 3, optimizes sword metallurgy at the Forge, and enters the cavern to shatter the Stone Golem.</li>
+<li><strong>Act III (The Caldera & Lair):</strong> Breaking the Golem's seal unlocks the volcanic pass. Reaching Level 5 prepares the hero for the enraged dragon, whose fiery fury accelerates gauge timing.</li>
+</ul>
+<h2>4.2 7-Member Customizable Cast</h2>
+<p>The project includes a group cast screen (<code class="inline-code">localStorage['dq2c']</code>) enabling full personalization of all five teammates plus forest foes:</p>
+<div class="table-container"><table>
+<thead>
+<tr><th>ID</th><th>Role</th><th>In-Game Name</th><th>Visual Representation</th><th>Gameplay Function</th></tr>
+</thead>
+<tbody>
+<tr ><td><code class="inline-code">hero</code></td><td>Protagonist</td><td>Hero</td><td>🗡️ / Player Sprite</td><td>Controllable champion; moves, executes strikes, drinks potions.</td></tr>
+<tr class="alt"><td><code class="inline-code">elder</code></td><td>Village Mentor</td><td>Elder Thales</td><td>🧙‍♂️ / Sprite Kitchen Mage</td><td>Quest giver; gives tactical calculus guidance across acts.</td></tr>
+<tr ><td><code class="inline-code">smith</code></td><td>Metallurgist</td><td>Smith Vulcan</td><td>🔨 / Forge Master</td><td>Free resting/healing; potion shop; Forge calibration; village debt line.</td></tr>
+<tr class="alt"><td><code class="inline-code">slime</code></td><td>Forest Monster</td><td>Forest Slime</td><td>🟢 / Animated Slime</td><td>Early training monster; inflicts Sticky Goo gauge slow.</td></tr>
+<tr ><td><code class="inline-code">goblin</code></td><td>Forest Monster</td><td>Forest Goblin</td><td>👺 / Animated Goblin</td><td>Agile monster; inflicts Poison Dagger damage-over-time.</td></tr>
+<tr class="alt"><td><code class="inline-code">golem</code></td><td>Mini-Boss</td><td>Lithos Golem</td><td>🗿 / Stone Sentinel</td><td>Act II gatekeeper (Cave room); inflicts Armor Shatter.</td></tr>
+<tr ><td><code class="inline-code">dragon</code></td><td>Final Boss</td><td>Ember Dragon</td><td>🐉 / Great Wyrm</td><td>Act III apex predator (Volcano room); enrages at 50% HP; inflicts Burn.</td></tr>
+</tbody>
+</table></div>
+
+<h2>4.3 Core Game Loop & World Map</h2>
+<p>The world is laid out on a logical <strong>12 column × 9 row tile grid</strong> (768×576 canvas resolution).</p>
+<ul>
+<li><strong>Row 0–2 (North):</strong> Mountain crags, Stone Golem Cavern (Left: cols 1–2, rows 1–2) and Ember Dragon Caldera (Right: cols 8–10, rows 0–2).</li>
+<li><strong>Row 3–5 (Midlands):</strong> Deep enchanted forest with roaming slimes and goblins; cobblestone roads connect the zones.</li>
+<li><strong>Row 6–8 (South):</strong> Thalesia Village with the Elder's thatched hut (col 1, row 7) and Vulcan's Blacksmith Forge (col 9, row 7).</li>
+</ul>
+<h2>4.4 Turn-Based Battle Mechanics</h2>
+<p>When the player collides with or actions an adjacent hostile entity, the game transitions into the combat arena:</p>
+<ol>
+<li><strong>Player Turn:</strong> The player chooses between <strong>⚡ Strike</strong> and <strong>🧪 Potion</strong>.</li>
+<li><strong>Gauge Calibration:</strong> Initiating a strike launches the logistic timing gauge. The needle sweeps from 0% to 100% along the S-curve $R(t)$.</li>
+<li><strong>Multiplier Tap:</strong> Clicking <strong>🎯 Tap Now</strong> records elapsed time $t_p$. The strike multiplier is evaluated analytically:</li>
+</ol>
+<div class="math-block">$$\text{Multiplier} = 0.5 + 1.5 \cdot \left[ 4 R(t_p)(1 - R(t_p)) \right]$$</div>
+<ol>
+<li><strong>Enemy Retaliation:</strong> The enemy attacks, factoring in active player armor debuffs, with a chance to inflict status conditions.</li>
+<li><strong>Turn-End Upkeep:</strong> Active player debuffs tick (poison/burn damage), duration counters decrement, and turn control returns to the player.</li>
+</ol>
+<h2>4.5 Combat Debuff Matrix</h2>
+<p>To introduce strategic depth, monsters inflict calculus-altering debuffs during combat:</p>
+<div class="table-container"><table>
+<thead>
+<tr><th>Monster</th><th>Debuff Name</th><th>Icon</th><th>Mechanism</th><th>Duration</th><th>Tactical Impact</th></tr>
+</thead>
+<tbody>
+<tr ><td><strong>Forest Slime</strong></td><td>Sticky Goo</td><td>🍯</td><td>$T_{\text{eff}} = T \times 1.30$</td><td>2 turns</td><td>Slows down the gauge sweep by 30%, shifting the inflection point from $t=2.0\text{s}$ to $t=2.6\text{s}$.</td></tr>
+<tr class="alt"><td><strong>Forest Goblin</strong></td><td>Poison Dagger</td><td>☠️</td><td>$\Delta \text{HP} = -6 / \text{turn}$</td><td>3 turns</td><td>Consistent turn-start health decay; forces timely potion usage.</td></tr>
+<tr ><td><strong>Stone Golem</strong></td><td>Armor Shatter</td><td>🗿</td><td>$\text{Dmg}_{\text{in}} = \text{Atk} + 4$</td><td>2 turns</td><td>Weakens player defensive stance; amplifies heavy incoming hits.</td></tr>
+<tr class="alt"><td><strong>Ember Dragon</strong></td><td>Inferno Burn</td><td>🔥</td><td>$\Delta \text{HP} = -10 / \text{turn}$</td><td>3 turns</td><td>Severe fire decay; synergizes with the dragon's enraged 38 ATK.</td></tr>
+</tbody>
+</table></div>
+
+<h2>4.6 Monster AI & Room-Bound Patrols</h2>
+<p>All monsters feature autonomous movement powered by a zone-constrained artificial intelligence loop running at 1200ms intervals:</p>
+<ul>
+<li><strong>Forest Slimes (x2):</strong> Roam freely within forest bounds ($x \in [2, 9], y \in [3, 5]$) with a 60% movement probability per tick.</li>
+<li><strong>Forest Goblins (x2):</strong> Roam throughout the broader forest borders ($x \in [1, 10], y \in [3, 6]$).</li>
+<li><strong>Stone Golem (Boss):</strong> Strictly room-bound to the mountain cave interior ($x \in [1, 2], y \in [1, 2]$); patrols inside its chamber and cannot escape into the forest.</li>
+<li><strong>Ember Dragon (Boss):</strong> Strictly room-bound to the volcanic lair ($x \in [8, 10], y \in [0, 2]$); patrols within the magma fields.</li>
+<li><strong>Collision Avoidance:</strong> Monsters cannot step onto solid rock walls, other entities, or the player tile. AI automatically halts during modal interactions or when frozen via Dev Mode.</li>
+</ul>
+<h2>4.7 Blacksmith Village Credit & Debt System</h2>
+<p>To eliminate dead-end fail states when a player is broke and under-leveled, the Blacksmith offers an emergency line of credit:</p>
+<ul>
+<li><strong>Village Loan:</strong> If a player possesses $< 20\text{g}$ and holds $< 60\text{g}$ total debt, they may take a healing potion on credit (+20g debt).</li>
+<li><strong>Automatic Bounty Withholding:</strong> Upon vanquishing any monster, 50% of earned bounty gold is automatically deducted toward the outstanding balance until fully repaid.</li>
+<li><strong>Manual Repayment:</strong> Players may repay outstanding debt at Vulcan's shop at any time.</li>
+<li><strong>HUD Telemetry:</strong> Outstanding liabilities are highlighted in the top status bar as a visible red badge <code class="inline-code">(Debt: Xg)</code>.</li>
+</ul>
+<hr>
+<h1 class="section-title">5. Differential Calculus Engine & Formal Proofs</h1>
+<p>The mathematical engine of <em>Derivative Quest</em> is founded on two core calculus pillars: <strong>Single-Variable Optimization</strong> and <strong>Logistic Concavity / Inflection Points</strong>.</p>
+<pre><code >                        CALCULUS MECHANICS IN DERIVATIVE QUEST
+                                           │
+         ┌─────────────────────────────────┴─────────────────────────────────┐
+         ▼                                                                   ▼
+1. THE FORGE (Optimization)                                2. BATTLE TIMING (Inflection)
+   • Domain: x in [0, 10]                                     • Domain: t in [0, T]
+   • Function: D(x) = x²(10 - x)                              • Function: R(t) = 1 / (1 + e^(-K(t - T/2)))
+   • Derivative: D&#39;(x) = 20x - 3x²                            • Derivative: R&#39;(t) = K·R(1 - R)
+   • Critical Point: x = 20/3 ≈ 6.67                          • 2nd Derivative: R&#39;&#39;(t) = K²·R(1 - R)(1 - 2R)
+   • 2nd Deriv Test: D&#39;&#39;(20/3) = -20 &lt; 0 (MAX!)               • Inflection Point: R&#39;&#39;(t) = 0 =&gt; t = T/2
+   • Optimal Damage: D(20/3) ≈ 148.15                         • Perfect Multiplier: 2.0x Critical Strike!</code></pre>
+<hr>
+<h2>5.1 The Forge: Strike Optimization Proof</h2>
+<h3>Problem Formulation:</h3>
+<p>A warrior is allocated a fixed attribute budget of <strong>10 points</strong> to distribute between <strong>Strength ($x$)</strong> and <strong>Focus ($10 - x$)</strong>. Strike power is proportional to the square of strength multiplied by focus:</p>
+<div class="math-block">$$D(x) = x^2(10 - x) = 10x^2 - x^3 \quad \text{for } x \in [0, 10]$$</div>
+<h3>Analytical Derivation:</h3>
+<h4>Step 1: Compute the First Derivative (Instantaneous Rate of Change)</h4>
+<p>Applying the power rule of differentiation:</p>
+<div class="math-block">$$D'(x) = \frac{d}{dx}\left[10x^2 - x^3\right] = 20x - 3x^2 = x(20 - 3x)$$</div>
+<h4>Step 2: Determine the Critical Points</h4>
+<p>Setting the first derivative equal to zero ($D'(x) = 0$):</p>
+<div class="math-block">$$x(20 - 3x) = 0 \implies x_1 = 0 \quad \text{or} \quad 20 - 3x = 0 \implies x_2 = \frac{20}{3} \approx 6.6667$$</div>
+<p>Both critical numbers lie within the closed domain $[0, 10]$.</p>
+<h4>Step 3: Apply the Second Derivative Test for Extrema</h4>
+<p>Differentiating $D'(x)$ with respect to $x$:</p>
+<div class="math-block">$$D''(x) = \frac{d}{dx}\left[20x - 3x^2\right] = 20 - 6x$$</div>
+<p>Evaluating concavity at both critical points:</p>
+<ol>
+<li><strong>At $x = 0$:</strong></li>
+</ol>
+<div class="math-block">$$D''(0) = 20 - 6(0) = 20 > 0$$</div>
+<p>   Because the second derivative is positive, the graph is <strong>concave upward</strong> at $x = 0$, establishing a <strong>Local Minimum</strong> with $D(0) = 0$.</p>
+<ol>
+<li><strong>At $x = \frac{20}{3}$:</strong></li>
+</ol>
+<div class="math-block">$$D''\left(\frac{20}{3}\right) = 20 - 6\left(\frac{20}{3}\right) = 20 - 40 = -20 < 0$$</div>
+<p>   Because the second derivative is negative, the graph is <strong>concave downward</strong> at $x = \frac{20}{3}$, establishing a <strong>Local Maximum</strong>!</p>
+<h4>Step 4: Evaluate the Absolute Extremum on the Closed Interval</h4>
+<p>Evaluating boundary endpoints and critical values:</p>
+<ul>
+<li>Boundary $x = 0$: $D(0) = 0^2(10 - 0) = 0$</li>
+<li>Boundary $x = 10$: $D(10) = 10^2(10 - 10) = 0$</li>
+<li>Critical Point $x = \frac{20}{3}$:</li>
+</ul>
+<div class="math-block">$$D\left(\frac{20}{3}\right) = \left(\frac{20}{3}\right)^2 \left(10 - \frac{20}{3}\right) = \left(\frac{400}{9}\right) \left(\frac{10}{3}\right) = \frac{4000}{27} \approx 148.1481$$</div>
+<p>Thus, by the Extreme Value Theorem, the absolute maximum strike power achievable on $[0, 10]$ is <strong>$148.15$</strong>, occurring uniquely at <strong>$x = \frac{20}{3}$</strong>.</p>
+<hr>
+<h2>5.2 Battle Timing: Logistic Gauge Inflection Point Proof</h2>
+<h3>Problem Formulation:</h3>
+<p>During combat, a power gauge charges according to a standard logistic function over duration $T$:</p>
+<div class="math-block">$$R(t) = \frac{1}{1 + e^{-K(t - T/2)}}, \quad \text{where } K = \frac{8}{T}$$</div>
+<p>The instantaneous speed of the gauge represents the player's potential kinetic focus. We seek the exact moment $t^*$ where the fill rate accelerates to its absolute peak.</p>
+<h3>Analytical Derivation:</h3>
+<h4>Step 1: Compute the First Derivative (Gauge Fill Velocity)</h4>
+<p>Rewriting $R(t) = \left(1 + e^{-u}\right)^{-1}$ where $u = K(t - T/2)$ and $\frac{du}{dt} = K$:</p>
+<div class="math-block">$$R'(t) = -1\left(1 + e^{-u}\right)^{-2} \cdot \left(-K e^{-u}\right) = K \cdot \frac{e^{-u}}{\left(1 + e^{-u}\right)^2}$$</div>
+<p>Recognizing that $\frac{e^{-u}}{1 + e^{-u}} = 1 - R(t)$:</p>
+<div class="math-block">$$R'(t) = K \cdot R(t)\left[1 - R(t)\right]$$</div>
+<p>This differential equation confirms that velocity depends directly on the product of current completion and remaining capacity.</p>
+<h4>Step 2: Compute the Second Derivative (Gauge Acceleration)</h4>
+<p>Applying the product rule to $R'(t)$:</p>
+<div class="math-block">$$R''(t) = \frac{d}{dt}\left[K (R - R^2)\right] = K(1 - 2R) \cdot R'(t) = K^2 R(t)\left[1 - R(t)\right]\left[1 - 2R(t)\right]$$</div>
+<h4>Step 3: Find the Point of Inflection ($R''(t) = 0$)</h4>
+<p>Since $K > 0$, $R(t) \in (0, 1)$, the terms $K^2$, $R(t)$, and $1 - R(t)$ are strictly positive for all finite $t$. Therefore:</p>
+<div class="math-block">$$R''(t) = 0 \iff 1 - 2R(t) = 0 \iff R(t) = \frac{1}{2} = 0.5$$</div>
+<p>Substituting $R(t) = 0.5$ back into the logistic definition:</p>
+<div class="math-block">$$\frac{1}{1 + e^{-K(t - T/2)}} = \frac{1}{2} \implies 1 + e^{-K(t - T/2)} = 2 \implies e^{-K(t - T/2)} = 1$$</div>
+<p>Taking the natural logarithm:</p>
+<div class="math-block">$$-K\left(t - \frac{T}{2}\right) = \ln(1) = 0 \implies t = \frac{T}{2}$$</div>
+<h4>Step 4: Concavity Analysis</h4>
+<ul>
+<li><strong>For $t < \frac{T}{2}$:</strong> $R(t) < 0.5 \implies 1 - 2R > 0 \implies R''(t) > 0$. The gauge is <strong>concave upward</strong> (accelerating).</li>
+<li><strong>For $t > \frac{T}{2}$:</strong> $R(t) > 0.5 \implies 1 - 2R < 0 \implies R''(t) < 0$. The gauge is <strong>concave downward</strong> (decelerating).</li>
+<li><strong>At $t = \frac{T}{2}$:</strong> The concavity changes sign. Hence, <strong>$t = \frac{T}{2}$ is a true Point of Inflection</strong>, where gauge velocity $R'(t)$ attains its global maximum:</li>
+</ul>
+<div class="math-block">$$R'_{\max} = K(0.5)(1 - 0.5) = \frac{K}{4} = \frac{2}{T}$$</div>
+<h4>Step 5: Normalization into Strike Multiplier</h4>
+<p>To reward tapping at the point of maximum rate of change, the timing score $f(t)$ is defined as the normalized velocity:</p>
+<div class="math-block">$$f(t) = \frac{R'(t)}{R'_{\max}} = \frac{K R(t)(1 - R(t))}{K / 4} = 4 R(t)\left[1 - R(t)\right] \in [0, 1]$$</div>
+<p>The combat damage multiplier is mapped linearly:</p>
+<div class="math-block">$$\text{Multiplier}(t) = 0.5 + 1.5 \cdot f(t) = 0.5 + 6 R(t)\left[1 - R(t)\right]$$</div>
+<ul>
+<li>At $t = \frac{T}{2}$ ($R = 0.5$): Multiplier is $0.5 + 1.5(1.0) = \mathbf{2.0\times}$ (<strong>Critical Strike</strong>).</li>
+<li>At gauge start or late tap ($R \to 0$ or $t \ge T$): Multiplier defaults to $\mathbf{0.5\times}$ penalty.</li>
+</ul>
+<hr>
+<h2>5.3 Step-by-Step Worked Defense Examples</h2>
+<h3>Example A: Build Comparison at the Forge</h3>
+<p>Suppose an inexperienced player selects a balanced split of $x = 5.0$ Strength and $5.0$ Focus:</p>
+<ol>
+<li><strong>Evaluate Power:</strong> $D(5) = 5^2(10 - 5) = 25 \times 5 = 125.0$</li>
+<li><strong>Evaluate Rate of Change:</strong> $D'(5) = 20(5) - 3(5^2) = 100 - 75 = +25.0 > 0$</li>
+</ol>
+<p>   <em> </em>Oral Defense Explanation:* "Because the first derivative is positive ($+25.0$), strike damage is increasing with respect to strength. This informs the player that allocating additional points into strength will increase damage output."</p>
+<ol>
+<li><strong>Optimized Build ($x = 6.67$):</strong></li>
+</ol>
+<div class="math-block">$$D(6.67) = (6.67)^2(10 - 6.67) = 44.49 \times 3.33 = 148.15$$</div>
+<div class="math-block">$$D'(6.67) = 20(6.67) - 3(6.67)^2 = 133.4 - 133.47 \approx 0$$</div>
+<div class="math-block">$$D''(6.67) = 20 - 6(6.67) = 20 - 40.02 = -20.02 < 0$$</div>
+<p>   <em> </em>Gameplay Consequence:* The calculus-optimized blade deals <strong>148.15 damage vs 125.0 damage</strong>, representing an <strong>18.5% permanent strike bonus</strong>, saving multiple turns in boss battles.</p>
+<hr>
+<h1 class="section-title">6. Technical Architecture & System Blueprint</h1>
+<h2>6.1 Layered Software Architecture</h2>
+<pre><code >┌────────────────────────────────────────────────────────────────────────┐
+│                        PRESENTATION LAYER                              │
+│  HTML5 Canvas Viewport (768×576)  │  Interactive Modals (CSS Grid/Flex)│
+│  - 12×9 Map &amp; Entity Renderer     │  - The Forge Dynamic Graph Canvas  │
+│  - Proximity Action Prompt        │  - 🔬 Live Calculus Telemetry HUD  │
+│  - Top Navigation &amp; Debt Badges   │  - 🛠️ Developer &amp; Instructor Panel │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                        GAME APPLICATION LAYER                          │
+│  Game Loop (60 FPS RAF)           │  Battle Controller                 │
+│  - Player Input (WASD / Touch)    │  - Logistic S-Curve Animation Loop │
+│  - Zone Monster AI Patrol Loop    │  - Turn State &amp; Debuff Tick Engine │
+│  - LocalStorage State (dq2/dq2c)  │  - SoundEngine (Web Audio Synth)   │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                       CALCULUS &amp; ASSET ENGINES                         │
+│  CalculusEngine (Pure Math)       │  SpriteKitchen (Pixel Generator)   │
+│  - D(x), D&#39;(x), D&#39;&#39;(x)            │  - Mage Canvas (32×32 Palette)     │
+│  - R(t), R&#39;(t), R&#39;&#39;(t)            │  - Slime Sheet (128×32 Squash 4FPS)│
+│  - Optimal Extrema Solvers        │  - Goblin Sheet (128×32 Walk 4FPS) │
+└────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h2>6.2 Analytical CalculusEngine Implementation</h2>
+<p>The mathematical engine is implemented as a standalone, zero-dependency JavaScript object:</p>
+<pre><code class="language-javascript">const CalculusEngine = {
+  // --- The Forge: Cubic Strike Optimization ---
+  // D(x) = x²(10 - x) = 10x² - x³
+  evaluateDamage(x) {
+    return Math.pow(x, 2) * (10 - x);
+  },
+
+  // First Derivative: D&#39;(x) = 20x - 3x²
+  evaluateFirstDerivative(x) {
+    return 20 * x - 3 * Math.pow(x, 2);
+  },
+
+  // Second Derivative: D&#39;&#39;(x) = 20 - 6x
+  evaluateSecondDerivative(x) {
+    return 20 - 6 * x;
+  },
+
+  // Theoretical Critical Peak: x* = 20/3
+  getOptimalStrength() {
+    return 20 / 3;
+  },
+
+  // Theoretical Absolute Maximum Damage: 4000 / 27 ≈ 148.148
+  getMaxDamage() {
+    return 4000 / 27;
+  },
+
+  // --- Battle Timing: Logistic S-Curve ---
+  // R(t) = 1 / (1 + e^(-K(t - T/2))), where K = 8/T
+  evaluateGauge(t, T) {
+    const K = 8 / T;
+    return 1 / (1 + Math.exp(-K * (t - T / 2)));
+  },
+
+  // First Derivative: R&#39;(t) = K · R(t) · (1 - R(t))
+  evaluateGaugeRate(t, T) {
+    const R = this.evaluateGauge(t, T);
+    const K = 8 / T;
+    return K * R * (1 - R);
+  },
+
+  // Second Derivative: R&#39;&#39;(t) = K² · R(t) · (1 - R(t)) · (1 - 2R(t))
+  evaluateGaugeSecondDeriv(t, T) {
+    const R = this.evaluateGauge(t, T);
+    const K = 8 / T;
+    return Math.pow(K, 2) * R * (1 - R) * (1 - 2 * R);
+  },
+
+  // Strike Multiplier: 0.5 + 1.5 · [4 · R(t) · (1 - R(t))]
+  calculateStrikeMultiplier(t, T) {
+    if (t &gt;= T) return 0.5; // Late penalty
+    const R = this.evaluateGauge(t, T);
+    const f = 4 * R * (1 - R);
+    return 0.5 + 1.5 * f;
+  }
+};</code></pre>
+<h2>6.3 Sprite Kitchen (kitchen-v2) Procedural Pixel Pipeline</h2>
+<p>To satisfy the constraint of having no broken external image links while maintaining high aesthetic quality, the <code class="inline-code">SpriteKitchen</code> engine generates all characters in-memory on hidden HTML5 <code class="inline-code"><canvas></code> elements at boot time:</p>
+<ul>
+<li><strong>Elder Thales (Mage):</strong> Rendered from <code class="inline-code">assets/recipes/mage.json</code> recipe (32×32 resolution, 8-color arcane palette <code class="inline-code">["#24203e","#403464","#64549b","#9380bf","#c5b4e3","#f6efd9","#211b34","#e3b594"]</code>). Draws conical star hat, ivory beard, robe, and glowing crystal staff.</li>
+<li><strong>Forest Slime:</strong> Rendered from <code class="inline-code">assets/recipes/slime.json</code> recipe (128×32 canvas strip, 4 animation frames). Computes parametric elliptical squash and stretch at 4 frames per second with oceanic palette.</li>
+<li><strong>Forest Goblin:</strong> Procedural 128×32 walk strip (4 frames). Renders pointed ears, red fangs, dagger, and dynamic alternating leg movement.</li>
+<li><strong>Drop-in PNG Override:</strong> If the user exports <code class="inline-code">.png</code> files from Sprite Kitchen into the <code class="inline-code">assets/</code> directory (<code class="inline-code">assets/slime.png</code>, <code class="inline-code">assets/mage.png</code>), the engine asynchronously loads and renders the custom artwork automatically.</li>
+</ul>
+<h2>6.4 Developer & Instructor Debug Panel</h2>
+<p>Accessible via the <strong>🛠️ Dev</strong> button in the header bar, the debug panel allows instructors to test and verify game systems during live presentations:</p>
+<div class="table-container"><table>
+<thead>
+<tr><th>Control</th><th>Action</th><th>Testing Purpose</th></tr>
+</thead>
+<tbody>
+<tr ><td><strong>God Mode Toggle</strong></td><td>Sets <code class="inline-code">devState.godMode = true</code></td><td>Disables player incoming damage; allows easy demonstration of boss battles.</td></tr>
+<tr class="alt"><td><strong>Freeze AI Toggle</strong></td><td>Sets <code class="inline-code">devState.freezeAI = true</code></td><td>Halts all monster movement; prevents monsters from roaming during demonstrations.</td></tr>
+<tr ><td><strong>Toggle Debuffs</strong></td><td>Toggles <code class="inline-code">devState.debuffsEnabled</code></td><td>Disables status conditions to test raw calculus timing without modifiers.</td></tr>
+<tr class="alt"><td><strong>Map Warps</strong></td><td>Warps player to (5,7), (5,5), (1,2), (9,1)</td><td>Instantly teleports between Village, Forest, Cave, and Volcano.</td></tr>
+<tr ><td><strong>Level Overrides</strong></td><td>Forces Level to 1, 3, 5, or 8</td><td>Bypasses level progression requirements for the Golem (Lv 3) and Dragon (Lv 5).</td></tr>
+<tr class="alt"><td><strong>Gold & Debt Overrides</strong></td><td>Adds +100g or resets debt to 0g</td><td>Allows quick testing of the Blacksmith shop and credit line system.</td></tr>
+</tbody>
+</table></div>
+
+<hr>
+<h1 class="section-title">7. Numerical Balance Sheet & Progression Constants</h1>
+<div class="table-container"><table>
+<thead>
+<tr><th>Game Variable</th><th>Mathematical Formula / Constant</th><th>Design Balance Purpose</th></tr>
+</thead>
+<tbody>
+<tr ><td><strong>Max Player HP</strong></td><td>$\text{HP}_{\max} = 60 + 15 \times \text{Level}$</td><td>Level 1: 75 HP $\rightarrow$ Level 3: 105 HP $\rightarrow$ Level 5: 135 HP $\rightarrow$ Level 8: 180 HP</td></tr>
+<tr class="alt"><td><strong>Strike Base Damage</strong></td><td>$D(x) = x^2(10 - x)$</td><td>Domain $x \in [0, 10]$; range $[0, 148.15]$</td></tr>
+<tr ><td><strong>Strike Level Modifier</strong></td><td>$\text{Mod} = 0.5 + 0.1 \times \text{Level}$</td><td>Level 1: $0.6\times$ $\rightarrow$ Level 5: $1.0\times$ $\rightarrow$ Level 8: $1.3\times$</td></tr>
+<tr class="alt"><td><strong>Total Strike Damage</strong></td><td>$\text{Damage} = D(x) \times (0.5 + 0.1 \times \text{Level}) \times \text{Multiplier}$</td><td>Scales player power across level ups and inflection taps</td></tr>
+<tr ><td><strong>XP to Next Level</strong></td><td>$\text{XP}_{\text{req}} = \text{Level} \times 60$</td><td>Lv 1: 60 XP $\rightarrow$ Lv 2: 120 XP $\rightarrow$ Lv 3: 180 XP (Max Lv 8)</td></tr>
+<tr class="alt"><td><strong>Forest Slime</strong></td><td>120 HP, 8 ATK, 50 XP, 10 Gold (10s respawn)</td><td>2–3 strikes to defeat; provides early XP and gold farming</td></tr>
+<tr ><td><strong>Forest Goblin</strong></td><td>160 HP, 12 ATK, 65 XP, 16 Gold (10s respawn)</td><td>Intermediate forest challenge; inflicts poison</td></tr>
+<tr class="alt"><td><strong>Stone Golem (Boss)</strong></td><td>450 HP, 18 ATK, 150 XP, 60 Gold (Req: Lv 3)</td><td>Checks player build calibration; inflicts armor shatter</td></tr>
+<tr ><td><strong>Ember Dragon (Boss)</strong></td><td>900 HP, 28 ATK ($38$ enraged), 500 XP, 200 Gold</td><td>Climactic confrontation; enrages at 50% HP (accelerates gauge to $T=3.0\text{s}$)</td></tr>
+<tr class="alt"><td><strong>Health Potion</strong></td><td>Heals $+40\text{ HP}$; costs $20\text{ Gold}$</td><td>Costs equivalent of 2 slimes; restores ~30–50% max health</td></tr>
+<tr ><td><strong>Credit Debt Limit</strong></td><td>Maximum $60\text{ Gold}$ debt; $+20\text{ Gold}$ per potion</td><td>Enables up to 3 safety potions when bankrupt</td></tr>
+</tbody>
+</table></div>
+
+<hr>
+<h1 class="section-title">8. Project File Structure & Deployment Guide</h1>
+<pre><code >derivative-quest/
+├── index.html                   # Master single-file application (HTML5 + CSS3 + JS)
+├── README.md                    # Root landing page &amp; quick start guide
+├── docs/                        # Complete academic &amp; design documentation
+│   ├── README.md                # Comprehensive documentation manual
+│   ├── GAME-DESIGN.md           # Game design document, cast &amp; backlog
+│   ├── TECHNICAL-BLUEPRINT.md   # Developer technical blueprint &amp; code templates
+│   ├── PROJECT-WORKFLOW.md      # Semester project phased workflow &amp; oral defense guide
+│   ├── RUBRIC.md                # MATH 101 official semester project rubric
+│   └── COMBINED-DOCUMENTATION.md# Complete unified project document
+└── assets/
+    └── recipes/                 # Sprite Kitchen JSON recipes &amp; asset archives
+        ├── mage.json            # Character Kitchen recipe: Elder Mage
+        ├── slime.json           # Character Kitchen recipe: Animated Forest Slime
+        ├── goblin-studio-042-32.json
+        ├── knight-studio-042-32.json
+        ├── mage-studio-042-32.json
+        ├── slime-studio-042-32.json
+        └── *.zip                # Dungeon &amp; creature backup asset bundles</code></pre>
+<h3>Zero-Friction Deployment Instructions:</h3>
+<ol>
+<li><strong>Local Play:</strong> Open <code class="inline-code">index.html</code> directly in any web browser. No web server, Node.js, or compilation required.</li>
+<li><strong>Web Hosting (GitHub Pages):</strong></li>
+</ol>
+<p>   * Push repository to GitHub (<code class="inline-code">https://github.com/klein-sys/math</code>).</p>
+<p>   * Navigate to <strong>Settings $\rightarrow$ Pages</strong>.</p>
+<p>   * Under <strong>Branch</strong>, select <code class="inline-code">main</code> (or <code class="inline-code">master</code>) and folder <code class="inline-code">/ (root)</code>.</p>
+<p>   * Click <strong>Save</strong>. The game will be immediately playable online via <code class="inline-code">https://<username>.github.io/<repo>/</code>.</p>
+<hr>
+<p><em>Derivative Quest was designed, authored, and proven for the MATH 101 Differential Calculus Semester Project.</em></p>
+  </div>
+
+</body>
+</html>
