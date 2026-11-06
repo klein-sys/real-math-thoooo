@@ -92,4 +92,6 @@ The game title does not need to name the concept. The final explanation must mat
 
 The automated checks cover exploration, reachable exits/NPCs, saves, combat turns, boss progression, guides and reports. They also verify that active combat does not call the paused calculus functions. Offline map/battle images have been inspected; browser layout and device testing remain outstanding.
 
-The interface now lives inside the game screen: HUD, objectives, character directory, menus, battles and notifications. Village warmth and readable action feedback draw inspiration from Stardew Valley and Soul Knight while retaining Emberbrook’s own story and existing turn-based combat.
+The interface now lives inside the game screen: HUD, objectives, menus, battles and notifications. Village warmth and readable action feedback draw inspiration from Stardew Valley and Soul Knight while retaining Emberbrook’s own story and existing turn-based combat.
+
+The illustrated backdrop is in Emberbrook Village. An existing save can resume in another region. Open **Dev**, then choose **Emberbrook** under region warps to preview the village without resetting progress. Character names appear in the world and dialogue.

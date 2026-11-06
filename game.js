@@ -1326,11 +1326,6 @@ document.getElementById('dev-btn-cleardebt').addEventListener('click', () => {
   saveGame();
   updateUI();
 });
-document.getElementById('btn-cast').addEventListener('click', () => {
-  populateCastModal();
-  openModal('modal-cast');
-});
-
 document.getElementById('btn-sound').addEventListener('click', () => {
   sounds.enabled = !sounds.enabled;
   document.getElementById('btn-sound').textContent = sounds.enabled ? '🔊' : '🔇';
@@ -1343,19 +1338,6 @@ document.getElementById('btn-battle-tap').addEventListener('click', () => {
   executePlayerStrike(elapsed);
 });
 // Item selection and Run are bound by initCombat().
-
-// Cast management
-function populateCastModal() {
-  const container = document.getElementById('cast-list');
-  container.innerHTML = '';
-
-  castData.forEach(member => {
-    const row = document.createElement('div');
-    row.className = 'cast-row';
-    row.innerHTML = `<span>${member.emoji}</span><strong>${member.name}</strong><span>${member.role}</span>`;
-    container.appendChild(row);
-  });
-}
 
 // Feedback stays inside the adventure, including shop and level-up messages.
 let noticeTimer;

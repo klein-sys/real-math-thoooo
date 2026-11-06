@@ -121,10 +121,10 @@ test('menus block encounter re-entry and allow switching without stacking', () =
   const g = boot();
   g.run("openModal('modal-guide'); interactWithEntity(entities[2]);");
   assert.equal(g.run('activeBattle'), null);
-  g.run("openModal('modal-cast');");
+  g.run("openModal('modal-dev');");
   assert.equal(g.elements.get('modal-guide').style.display, 'none');
-  assert.equal(g.elements.get('modal-cast').style.display, 'flex');
-  g.run("closeModal('modal-cast'); startBattle(entities[2]); openModal('modal-guide');");
+  assert.equal(g.elements.get('modal-dev').style.display, 'flex');
+  g.run("closeModal('modal-dev'); startBattle(entities[2]); openModal('modal-guide');");
   assert.equal(g.elements.get('modal-guide').style.display, 'none');
 });
 

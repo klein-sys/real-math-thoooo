@@ -60,4 +60,6 @@ Run `node --test tests/game.test.cjs` with Node.js. Tests execute the actual gam
 
 See [RPG design and asset notes](docs/RPG-EXPANSION.md), [the technical blueprint](docs/TECHNICAL-BLUEPRINT.md) and [the course rubric](docs/RUBRIC.md).
 
-The interface now lives inside the game screen: HUD, objectives, character directory, menus, battles and notifications. Village warmth and readable action feedback draw inspiration from Stardew Valley and Soul Knight while retaining Emberbrook’s own story and existing turn-based combat.
+The interface now lives inside the game screen: HUD, objectives, menus, battles and notifications. Village warmth and readable action feedback draw inspiration from Stardew Valley and Soul Knight while retaining Emberbrook’s own story and existing turn-based combat.
+
+The illustrated backdrop is in Emberbrook Village. An existing save can resume in another region. Open **Dev**, then choose **Emberbrook** under region warps to preview the village without resetting progress. Character names appear in the world and dialogue.

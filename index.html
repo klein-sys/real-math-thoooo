@@ -838,7 +838,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="rpg.css">
+  <link rel="stylesheet" href="rpg.css?v=emberbrook-2">
 </head>
 
 <body>
@@ -891,9 +891,6 @@
         </button>
         <button id="btn-dev" class="btn" style="background: #1e1e2f; border-color: #6366f1; color: #c7d2fe;" title="Open Developer & Instructor Debug Panel">
           🛠️ Dev
-        </button>
-        <button id="btn-cast" class="btn" title="Meet the characters">
-          👥 Characters
         </button>
         <button id="btn-fullscreen" class="btn" title="Toggle fullscreen">⛶ Fullscreen</button>
         <button id="btn-sound" class="btn" title="Toggle audio">
@@ -1124,31 +1121,6 @@
   </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 4: CAST CUSTOMIZATION SCREEN                                        -->
-    <!-- ========================================================================= -->
-    <div id="modal-cast" class="modal-overlay">
-      <div class="modal-box" style="max-width: 540px;">
-        <div class="modal-header">
-          <div class="modal-title">
-            <span>People of Emberbrook</span>
-          </div>
-          <button class="close-btn" data-close="modal-cast">&times;</button>
-        </div>
-        <p style="font-size: 13px; color: var(--text-muted);">
-          Familiar faces, each with a role in the village's story.
-        </p>
-
-        <div style="display: flex; flex-direction: column; gap: 10px;" id="cast-list">
-          <!-- Generated via JS -->
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
-          <button class="btn btn-primary" data-close="modal-cast">Back to adventure</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
     <!-- MODAL 5: NPC DIALOGUE & SHOP                                              -->
     <!-- ========================================================================= -->
     <div id="modal-dialogue" class="modal-overlay">
@@ -1306,10 +1278,10 @@
 
     <div id="game-notice" role="status" aria-live="polite" hidden></div>
   </div>
-    <script src="world.js"></script>
-    <script src="combat.js"></script>
-    <script src="art-direction.js"></script>
-    <script src="game.js"></script>
+    <script src="world.js?v=emberbrook-2"></script>
+    <script src="combat.js?v=emberbrook-2"></script>
+    <script src="art-direction.js?v=emberbrook-2"></script>
+    <script src="game.js?v=emberbrook-2"></script>
 </body>
 
 </html>
