@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const project = path.join(__dirname, '..');
-const sources = ['world.js', 'combat.js', 'game.js'].map(file => fs.readFileSync(path.join(project, file), 'utf8'));
+const sources = ['world.js', 'combat.js', 'art-direction.js', 'game.js'].map(file => fs.readFileSync(path.join(project, file), 'utf8'));
 
 // Execute the actual game script with lightweight browser substitutes.
 function boot(saves = {}, blocked = false) {
@@ -43,7 +43,7 @@ function boot(saves = {}, blocked = false) {
     },
     localStorage: { getItem(key) { if (blocked) throw Error('blocked'); return saves[key] ?? null; },
       setItem(key, value) { if (blocked) throw Error('blocked'); saves[key] = value; } },
-    setTimeout(fn) { timers.push(fn); return timers.length; }, setInterval() { return 1; }, clearInterval() {},
+    setTimeout(fn) { timers.push(fn); return timers.length; }, setInterval() { return 1; }, clearInterval() {}, clearTimeout() {},
     requestAnimationFrame() { return 1; }, cancelAnimationFrame() {}, alert() {},
     window: { innerWidth: 1200, listeners: {}, addEventListener(event, fn) { this.listeners[event] = fn; } }
   };
@@ -219,7 +219,7 @@ test('HTML containers are balanced, modal dialogs are siblings, IDs are unique',
     const name = tag.match(/^<\/?(\w+)/)[1];
     if (tag.startsWith('</')) assert.equal(stack.pop(), name, `Bad nesting near ${tag} at ${token.index}`);
     else {
-      if (tag.includes('class="modal-overlay"')) assert.equal(stack.length, 0, 'Modals must be siblings');
+      if (tag.includes('class="modal-overlay"')) assert.equal(stack.length, 1, 'Modals must be siblings inside the game container');
       stack.push(name);
     }
   }
@@ -363,3 +363,12 @@ test('every map exit is reachable from its spawn with collision enabled', () => 
   })()`);
   assert.equal(JSON.stringify(unreachable),'[]');
 });
+
+ test('old customized saves cannot rename story characters', () => {
+ const g = boot({dq2c: JSON.stringify([{id:'elder',name:'Changed',emoji:'X'}])});
+ assert.equal(g.run("getCastMember('elder').name"), 'Elder Thales');
+ assert.equal(g.run('Object.isFrozen(castData[1])'), true);
+ g.run("showGameNotice('Restored health')");
+ assert.equal(g.elements.get('game-notice').textContent, 'Restored health');
+ assert.equal(g.elements.get('game-notice').hidden, false);
+ });

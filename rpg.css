@@ -65,3 +65,92 @@ h1 span { display:block; margin-top:9px; font:500 9px 'JetBrains Mono',monospace
   .telemetry-grid {grid-template-columns:repeat(2,1fr);}.forge-split-row {font-size:12px;}.location-plaque {max-width:60%;}
 }
 @media(prefers-reduced-motion:reduce) { .modal-box,.btn {animation:none;transition:none;} }
+
+/* One bounded game screen: world, HUD, dialogue, battles and feedback. */
+body { height:100dvh; min-height:0; overflow:hidden; justify-content:center; }
+#game-container { position:relative; isolation:isolate; width:100%; max-width:1440px; height:100dvh; padding:0; overflow:hidden; background:#142820; }
+.game-masthead,.explore-footer { display:none; }
+.viewport-card { position:absolute; inset:0; padding:0; border:0; border-radius:0; }
+#canvas-wrapper { height:100%; border-radius:0; }
+#gameCanvas { width:100%; height:100%; object-fit:cover; }
+.top-bar { position:absolute; top:12px; left:12px; right:12px; z-index:5; border:2px solid #a58953; border-radius:5px; background:#26372bef; padding:9px 12px; box-shadow:0 3px 0 #142019; }
+.quest-banner { position:absolute; top:100px; left:12px; z-index:4; max-width:min(460px,calc(100% - 24px)); background:#302e20ed; border:1px solid #aa905b; border-radius:4px; padding:9px 12px; }
+.location-plaque { top:auto; bottom:14px; left:50%; transform:translateX(-50%); text-align:center; padding:8px 16px; border:0; background:#142224c9; }
+.location-plaque .eyebrow,.location-plaque>span:last-child { display:none; }
+.location-plaque strong { font-size:17px; }
+#interact-toast { bottom:70px; z-index:6; }
+.modal-overlay { position:absolute; inset:0; width:100%; height:100%; padding:12px; }
+.modal-box { max-height:100%; border:2px solid #a58953; border-radius:5px; }
+#game-notice { position:absolute; z-index:2000; bottom:18px; left:50%; transform:translateX(-50%); width:max-content; max-width:85%; padding:12px 18px; background:#f0dfad; color:#30291b; border:3px solid #8d6f41; box-shadow:0 4px 12px #0008; pointer-events:none; }
+.cast-row { display:grid; grid-template-columns:32px 1fr; gap:6px; padding:12px; border-bottom:1px solid #a5895355; }
+.cast-row>span:last-child { grid-column:2; color:#c6c7ac; font-size:12px; }
+@media(max-width:700px) {
+  #game-container { padding:0; }
+  .top-bar { top:6px; left:6px; right:6px; padding:6px; gap:5px; }
+  .hero-avatar { display:none; }.hero-name { font-size:15px; }
+  .top-actions { gap:4px; }.top-actions .btn { min-height:36px; padding:6px; }
+  .quest-banner { top:124px; left:6px; padding:7px; max-width:calc(100% - 12px); }
+  .location-plaque { max-width:50%; bottom:8px; }.location-plaque strong { font-size:13px; }
+  .modal-box { max-height:100%; padding:12px; }
+}
+@media(max-height:500px) { .quest-banner { top:82px; } .location-plaque { display:none; } }
+
+/* Edge-to-edge world with compact controls and protected map corners. */
+html, body { width:100%; height:100%; margin:0; }
+#game-container { max-width:none; width:100vw; height:100dvh; }
+#game-container:fullscreen { width:100vw; height:100vh; }
+#gameCanvas { aspect-ratio:auto; object-fit:fill; }
+.top-bar { right:auto; max-width:calc(100% - 24px); background:#172b25ee; border-color:#b7a16d; }
+.hero-summary { gap:8px; }
+.top-actions { flex-wrap:wrap; }
+.quest-banner { top:96px; max-width:350px; box-shadow:0 3px 12px #0004; }
+#btn-dev { display:none; }
+.location-plaque { left:50%; bottom:12px; }
+#joystick { bottom:24px; }
+.interact-button { bottom:160px; right:24px; }
+#interact-toast { bottom:110px; max-width:60%; }
+@media (pointer:fine) {
+  #joystick { opacity:.35; }
+  #joystick:hover { opacity:1; }
+}
+@media(max-width:700px) {
+  .top-bar { max-width:calc(100% - 12px); }
+  .quest-banner { top:130px; max-width:calc(100% - 24px); font-size:11px; }
+  .hero-meta .bars-row { gap:6px; }
+  .stat-bar-container { width:75px; }
+  .interact-button { bottom:165px; right:12px; }
+  #interact-toast { bottom:120px; max-width:70%; }
+}
+
+#canvas-wrapper { max-width:none; aspect-ratio:auto; flex:1; min-height:0; }
+
+.touch-controls { width:100%; height:100%; z-index:3; }
+#joystick { display:block; opacity:.8; }
+@media(max-width:700px) {
+ .top-bar { display:grid; grid-template-columns:1fr; width:calc(100% - 12px); gap:4px; }
+ .hero-summary { width:100%; }
+ .hero-meta { width:100%; flex-direction:row; align-items:center; justify-content:space-between; }
+ .bars-row { flex-wrap:nowrap; }
+ .top-actions { display:flex; flex-wrap:nowrap; gap:3px; justify-content:space-between; }
+ .top-actions .btn { font-size:9px; min-height:32px; padding:4px; }
+ .quest-banner { top:98px; }
+ .location-plaque { top:auto; left:50%; }
+}
+/* Woodland brass interface */
+.top-bar,.quest-banner,.modal-box {
+  border-color:#c8a66d;
+  box-shadow:0 3px 0 #30281e,0 8px 24px #10211980;
+}
+.top-bar,.modal-box { background:linear-gradient(145deg,#29483c,#182f2a); }
+.quest-banner { background:#30271fee; }
+.btn { background:#263e32; border-color:#8c8058; }
+.btn-primary { background:#d8b16d; color:#24231c; }
+.battle-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
+.battle-btn { justify-content:center; }
+.guard-btn { background:#334f62; border:1px solid #86b5c6; color:#edf8ff; }
+.enemy-intent { color:#ffdcab; background:#513527; padding:8px 12px; border-left:3px solid #e2a568; font-size:12px; }
+#modal-battle .modal-box { gap:8px; }
+@media(max-width:520px) {
+  .battle-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #modal-battle .battle-heading { margin-bottom:2px; }
+}

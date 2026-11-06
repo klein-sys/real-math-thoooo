@@ -14,6 +14,8 @@ Open `index.html` in a modern browser. Keep the JavaScript, CSS and `assets/game
 
 ## Battles
 
+- **Guard:** take 65% less direct damage on the next enemy turn. Your next strike deals 35% more damage.
+
 - **Attack:** charge, then release at the center for the strongest hit.
 - **Item:** open your inventory and use a healing potion. It restores 40 HP and uses your turn.
 - **Run:** 75% chance to escape forest monsters. Failure uses your turn. Guardians block escape.
@@ -21,6 +23,12 @@ Open `index.html` in a modern browser. Keep the JavaScript, CSS and `assets/game
 - **Help:** open **How to play** for controls, preparation and travel advice.
 
 Reach Level 3 before fighting the Golem. Defeat the Golem and reach Level 5 to enter the volcano. Losing returns you to Emberbrook with full HP and half your gold.
+
+## Exploration and visuals
+
+Hold Shift while moving to sprint. Open the marked supply caches in Emberbrook, Whispering Forest, and Stonebound Cavern for one potion and 15 gold each. Claimed caches stay open across saves.
+
+Emberbrook has an original illustrated map generated with ImageGen. Its layout follows the prompt for a warm woodland village with two distinct cottages, a central well, and a northbound path. The fullscreen HUD and battle panels share a warm brass and woodland palette.
 
 ## Current design focus
 
@@ -42,7 +50,7 @@ The final assignment still requires one calculus concept to affect gameplay. Cho
 | `tests/game.test.cjs` | Gameplay, asset and map checks |
 | `previews/` | Offline renders of the areas and battle scene |
 
-Existing saves preserve progression, inventory, gold, debt and cast names. Saves from the previous map start in Emberbrook; new saves preserve the region and continuous position. The developer panel supports level overrides, region warps, God Mode, AI freeze and debuff toggles.
+Existing saves preserve progression, inventory, gold and debt. Saves from the previous map start in Emberbrook; new saves preserve the region and continuous position. The developer panel supports level overrides, region warps, God Mode, AI freeze and debuff toggles.
 
 ## Development checks
 
@@ -51,3 +59,5 @@ Run `node --test tests/game.test.cjs` with Node.js. Tests execute the actual gam
 `tools/extract-assets.ps1` regenerates selected assets from the archives. `tools/render-preview.cjs` renders the drawing code using optional `@napi-rs/canvas`; set `CANVAS_MODULE` to its module path if needed.
 
 See [RPG design and asset notes](docs/RPG-EXPANSION.md), [the technical blueprint](docs/TECHNICAL-BLUEPRINT.md) and [the course rubric](docs/RUBRIC.md).
+
+The interface now lives inside the game screen: HUD, objectives, character directory, menus, battles and notifications. Village warmth and readable action feedback draw inspiration from Stardew Valley and Soul Knight while retaining Emberbrook’s own story and existing turn-based combat.

@@ -16,10 +16,8 @@ function renderBattleScene() {
     const x=i*90-20;
     c.beginPath();c.moveTo(x,185);c.lineTo(x+55,35+(i%3)*20);c.lineTo(x+140,185);c.closePath();c.fill();
   }
-  const floor=kind==='cave'?'tile_dungeon_floor':kind==='volcano'?'tile_dirt':'tile_grass';
   for(let x=0;x<w;x+=48)for(let y=185;y<h;y+=48) {
-    c.fillStyle='#424c3d';c.fillRect(x,y,48,48);
-    blit(c,(kind==='cave'||kind==='volcano'?DUNGEON:MEDIEVAL)+floor+'.png',x,y,48,48);
+    paintGround(c,kind,true,x,y,48);
   }
   c.fillStyle='#0c172455';c.fillRect(0,0,w,h);
   const heroX=w*0.24,enemyX=w*0.76,ground=235;

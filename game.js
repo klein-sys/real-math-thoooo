@@ -158,14 +158,8 @@ function readSave(key) {
   catch { return null; }
 }
 
-const savedCast = readSave('dq2c');
-let castData = DEFAULT_CAST.map(member => {
-  const saved = Array.isArray(savedCast) && savedCast.find(item => item && item.id === member.id);
-  return { ...member,
-    name: saved && typeof saved.name === 'string' && saved.name.trim() ? saved.name.slice(0, 80) : member.name,
-    emoji: saved && typeof saved.emoji === 'string' && saved.emoji.trim() ? saved.emoji.slice(0, 32) : member.emoji
-  };
-});
+// Story identities are fixed, including when loading older customized saves.
+const castData = Object.freeze(DEFAULT_CAST.map(member => Object.freeze({ ...member })));
 
 const defaultState = {
   level: 1,
@@ -183,6 +177,7 @@ const defaultState = {
   totalStrikes: 0,
   perfectInflections: 0,
   mapId: 'village',
+  supplies: 0,
   worldVersion: 0
 };
 const savedState = readSave('dq2');
@@ -575,7 +570,7 @@ function openElderDialogue() {
     dlgText.innerHTML = `
 "Welcome, young champion! The <strong>Ember Dragon</strong> burned our village fields and stole the harvest! 
 The mountain cave is sealed by the <strong>Stone Golem</strong>. Train on the forest slimes until you reach <strong>Level 3</strong>, 
-and visit the Blacksmith for healing and potions before entering the cave!"
+First, visit Vulcan in the red-roofed house for supplies. Then follow the north path into Whispering Forest. Practice on a slime before taking on the cave!"
     `;
     saveGame();
     updateUI();
@@ -655,7 +650,7 @@ document.getElementById('btn-shop-heal').addEventListener('click', () => {
   sounds.playHeal();
   updateUI();
   saveGame();
-  alert("💖 Your HP has been fully restored!");
+  showGameNotice("💖 Your HP has been fully restored!");
 });
 
 document.getElementById('btn-shop-potion').addEventListener('click', () => {
@@ -665,9 +660,9 @@ document.getElementById('btn-shop-potion').addEventListener('click', () => {
     sounds.playHeal();
     updateUI();
     saveGame();
-    alert(`🧪 Potion acquired! You now carry ${gameState.potions} potions.`);
+    showGameNotice(`🧪 Potion acquired! You now carry ${gameState.potions} potions.`);
   } else {
-    alert("❌ Not enough gold! Slay slimes or goblins to earn gold, or borrow on village credit below.");
+    showGameNotice("❌ Not enough gold! Slay slimes or goblins to earn gold, or borrow on village credit below.");
   }
 });
 
@@ -678,10 +673,10 @@ document.getElementById('btn-shop-debt-potion').addEventListener('click', () => 
     sounds.playHeal();
     updateUI();
     saveGame();
-    alert(`💳 You took a potion on village credit (+20g debt)! Current debt: ${gameState.debt}g. Repay it with monster bounties.`);
+    showGameNotice(`💳 You took a potion on village credit (+20g debt)! Current debt: ${gameState.debt}g. Repay it with monster bounties.`);
     openSmithDialogue();
   } else {
-    alert("⚠️ Maximum village credit limit reached (60g)! Slay monsters to pay off your debt.");
+    showGameNotice("⚠️ Maximum village credit limit reached (60g)! Slay monsters to pay off your debt.");
   }
 });
 
@@ -693,7 +688,7 @@ document.getElementById('btn-shop-repay-debt').addEventListener('click', () => {
     sounds.playFanfare();
     updateUI();
     saveGame();
-    alert(`🪙 Repaid ${pay}g of village debt! Remaining debt: ${gameState.debt}g.`);
+    showGameNotice(`🪙 Repaid ${pay}g of village debt! Remaining debt: ${gameState.debt}g.`);
     openSmithDialogue();
   }
 });
@@ -849,6 +844,8 @@ function startBattle(enemy) {
     isEnraged: false,
     playerTurn: true,
     playerDebuffs: [],
+    guarding: false,
+    focused: false,
     history: []
   };
 
@@ -875,6 +872,7 @@ function updateBattleUI() {
 
   document.getElementById('battle-enemy-hp-bar').style.width = `${ePct}%`;
   document.getElementById('battle-enemy-hp-text').textContent = `${Math.ceil(activeBattle.enemyHp)} / ${activeBattle.enemyMaxHp} HP`;
+  document.getElementById('enemy-intent').textContent = `Next enemy hit: ${activeBattle.enemyAtk} damage · Guard reduces direct damage by 65%`;
   syncBattleActions();
 
   // Active Status Debuffs Row
@@ -912,6 +910,7 @@ function logBattle(msg) {
 function syncBattleActions() {
   const canAct = !!activeBattle && activeBattle.playerTurn && !isGaugeRunning;
   document.getElementById('btn-battle-strike').disabled = !canAct;
+  document.getElementById('btn-battle-guard').disabled = !canAct;
   document.getElementById('btn-battle-potion').disabled = !canAct;
   document.getElementById('btn-battle-run').disabled = !canAct || (activeBattle && activeBattle.enemy.type !== 'monster');
   document.getElementById('btn-use-potion').disabled = !canAct || gameState.potions <= 0;
@@ -985,6 +984,7 @@ function executePlayerStrike(t) {
   const baseD = PrototypeCombat.basePower;
   const lvlMod = PrototypeCombat.levelFactor(gameState.level);
   let totalDmg = Math.round(baseD * lvlMod * mult);
+  if(activeBattle.focused) { totalDmg = Math.round(totalDmg * 1.35); activeBattle.focused=false; }
   if (devState.godMode) totalDmg *= 2; // God Mode bonus
   recordStrike(t, T, mult, totalDmg);
   animateCombat('hero', 'attack');
@@ -1021,6 +1021,7 @@ function enemyTurn() {
   const stunDebuff = activeBattle.playerDebuffs.find(d => d.type === 'stun');
   if (stunDebuff) dmg += 4; // Extra damage from armor shatter
 
+  if(activeBattle.guarding) { dmg=Math.ceil(dmg*0.35); activeBattle.guarding=false; }
   if (devState.godMode) {
     logBattle(`🛡️ God Mode active! 0 damage taken.`);
   } else {
@@ -1114,7 +1115,7 @@ function processPlayerDebuffs() {
 function usePotion() {
   if (!activeBattle || !activeBattle.playerTurn || isGaugeRunning) return;
   if (gameState.potions <= 0) {
-    alert("No potions remaining!");
+    showGameNotice("No potions remaining!");
     return;
   }
   animateCombat('hero', 'idle', '+40 HP');
@@ -1194,7 +1195,7 @@ function checkLevelUp() {
     gameState.hp = getMaxHP();
     requiredXP = getNextLevelXP();
     sounds.playFanfare();
-    alert(`⭐ LEVEL UP! You reached Level ${gameState.level}! Max HP increased to ${getMaxHP()}!`);
+    showGameNotice(`⭐ LEVEL UP! You reached Level ${gameState.level}! Max HP increased to ${getMaxHP()}!`);
   }
 }
 
@@ -1239,7 +1240,7 @@ function updateUI() {
   const bBadge = document.getElementById('ui-boss-badge');
 
   if (gameState.questStep === 0) {
-    qText.textContent = "Enter the Elder’s house in Emberbrook to receive your quest.";
+    qText.textContent = "Meet Elder Thales in the blue-roofed house on the left.";
     bBadge.textContent = "Act I: Village";
   } else if (gameState.questStep === 1) {
     qText.textContent = "Train in Whispering Forest. Reach Lv 3, then enter Stonebound Cavern.";
@@ -1348,34 +1349,23 @@ function populateCastModal() {
   const container = document.getElementById('cast-list');
   container.innerHTML = '';
 
-  castData.forEach((member, idx) => {
+  castData.forEach(member => {
     const row = document.createElement('div');
     row.className = 'cast-row';
-    row.innerHTML = `
-<input type="text" class="cast-emoji-input" maxlength="16" value="${escapeHTML(member.emoji)}" data-idx="${idx}" data-field="emoji">
-<input type="text" class="cast-name-input" value="${escapeHTML(member.name)}" data-idx="${idx}" data-field="name">
-<span style="font-size: 11px; color: var(--text-muted);">${member.role}</span>
-    `;
+    row.innerHTML = `<span>${member.emoji}</span><strong>${member.name}</strong><span>${member.role}</span>`;
     container.appendChild(row);
   });
 }
 
-document.getElementById('btn-save-cast').addEventListener('click', () => {
-  document.querySelectorAll('#cast-list .cast-row').forEach(row => {
-    const emojiInput = row.querySelector('.cast-emoji-input');
-    const nameInput = row.querySelector('.cast-name-input');
-    const idx = parseInt(emojiInput.dataset.idx);
-
-    castData[idx].emoji = emojiInput.value.trim() || castData[idx].emoji;
-    castData[idx].name = nameInput.value.trim() || castData[idx].name;
-  });
-
-  saveCast();
-  updateUI();
-  renderMap();
-  closeModal('modal-cast');
-  alert("👥 Cast updated and saved!");
-});
+// Feedback stays inside the adventure, including shop and level-up messages.
+let noticeTimer;
+function showGameNotice(message) {
+  const notice = document.getElementById('game-notice');
+  notice.textContent = message;
+  notice.hidden = false;
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => { notice.hidden = true; }, 5500);
+}
 
 // Slime Respawn Interval (Every second decrement)
 setInterval(() => {
@@ -1398,3 +1388,28 @@ updateUI();
 checkProximityPrompt();
 renderMap();
 requestAnimationFrame(gameLoop);
+
+
+document.getElementById('btn-fullscreen').addEventListener('click', async () => {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await document.getElementById('game-container').requestFullscreen();
+    }
+  } catch {
+    showGameNotice('Use your browser fullscreen control (F11 on desktop).');
+  }
+});
+
+
+function guardTurn() {
+  if (!activeBattle || !activeBattle.playerTurn || isGaugeRunning) return;
+  activeBattle.guarding = true;
+  activeBattle.focused = true;
+  activeBattle.playerTurn = false;
+  logBattle('Guard raised. Take 65% less direct damage, then strike with 35% more power.');
+  syncBattleActions();
+  setTimeout(enemyTurn, 550);
+}
+document.getElementById('btn-battle-guard').addEventListener('click', guardTurn);

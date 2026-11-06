@@ -892,9 +892,10 @@
         <button id="btn-dev" class="btn" style="background: #1e1e2f; border-color: #6366f1; color: #c7d2fe;" title="Open Developer & Instructor Debug Panel">
           🛠️ Dev
         </button>
-        <button id="btn-cast" class="btn" title="Edit 7-member team cast">
-          👥 Cast
+        <button id="btn-cast" class="btn" title="Meet the characters">
+          👥 Characters
         </button>
+        <button id="btn-fullscreen" class="btn" title="Toggle fullscreen">⛶ Fullscreen</button>
         <button id="btn-sound" class="btn" title="Toggle audio">
           🔊
         </button>
@@ -923,7 +924,6 @@
 
       <div class="explore-footer"><span>WASD / arrows to move · E / Space to interact</span><span>Follow the marked paths to discover new regions.</span></div>
     </main>
-  </div>
 
   <!-- ========================================================================= -->
   <!-- MODAL 1: THE FORGE (CALCULUS OPTIMIZATION ENGINE)                         -->
@@ -1005,7 +1005,7 @@
   <!-- ========================================================================= -->
   <div id="modal-battle" class="modal-overlay">
     <div class="modal-box" style="max-width: 800px;">
-      <div class="battle-heading"><span class="eyebrow">STAND YOUR GROUND</span><strong>Encounter</strong><span>Choose your next move</span></div>
+      <div class="battle-heading"><span class="eyebrow">STAND YOUR GROUND</span><strong>Encounter</strong><span>Read the enemy. Time your strike. Protect the harvest.</span></div>
       <canvas id="battle-scene" width="720" height="280" aria-label="Animated battle scene"></canvas>
       <div class="battle-header">
         <!-- Player Card -->
@@ -1064,6 +1064,7 @@
 
       <div id="battle-items" class="battle-inventory" hidden><div><img src="assets/game/loot_essentials_24/assets/png/potions/health_potion.png" alt=""><span><strong>Healing potion × <span id="item-potion-count">2</span></strong><small>Restore 40 HP · uses your turn</small></span></div><button id="btn-use-potion" class="btn btn-primary">Use potion</button><button id="btn-items-back" class="btn">Back</button></div>
       <!-- Battle Action Buttons -->
+      <div id="enemy-intent" class="enemy-intent"></div>
       <div class="battle-actions">
         <button id="btn-battle-strike" class="battle-btn strike-btn">
           ⚔ Attack
@@ -1071,12 +1072,13 @@
         <button id="btn-battle-tap" class="battle-btn tap-strike-btn" style="display: none;">
           🎯 RELEASE NOW!
         </button>
+        <button id="btn-battle-guard" class="battle-btn guard-btn">◇ Guard</button>
         <button id="btn-battle-potion" class="battle-btn potion-btn">
           ▣ Item (<span id="battle-potion-count">2</span>)
         </button>
         <button id="btn-battle-run" class="battle-btn run-btn" title="75% escape chance against forest enemies; guardians block escape">↗ Run</button>
       </div>
-      <p class="battle-help">Attack: charge and release at the center. Item: use a potion. Run: 75% escape chance; unavailable against guardians.</p>
+      <p class="battle-help">Attack at the center for a critical hit. Guard reduces the next direct hit and powers up your next attack.</p>
     </div>
   </div>
 
@@ -1128,13 +1130,12 @@
       <div class="modal-box" style="max-width: 540px;">
         <div class="modal-header">
           <div class="modal-title">
-            <span>👥 Cast & Team Customization</span>
+            <span>People of Emberbrook</span>
           </div>
           <button class="close-btn" data-close="modal-cast">&times;</button>
         </div>
         <p style="font-size: 13px; color: var(--text-muted);">
-          Personalize your project's 7-member team cast. Changes save to browser localStorage (<code
-            class="mono-font">dq2c</code>).
+          Familiar faces, each with a role in the village's story.
         </p>
 
         <div style="display: flex; flex-direction: column; gap: 10px;" id="cast-list">
@@ -1142,7 +1143,7 @@
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
-          <button class="btn btn-primary" id="btn-save-cast">Save Cast</button>
+          <button class="btn btn-primary" data-close="modal-cast">Back to adventure</button>
         </div>
       </div>
     </div>
@@ -1296,15 +1297,18 @@
       </div>
       <div class="proof-card"><strong>Explore and talk</strong><p>Hold WASD or the arrow keys, or drag the joystick. Press E / Space or Action near someone to talk or fight. Walk through the marked doorways to travel.</p></div>
       <div class="proof-card"><strong>Start with the village</strong><p>Visit the Elder in the blue-roofed house on the left. The blacksmith in the red-roofed house heals you for free and sells potions.</p></div>
-      <div class="proof-card"><strong>Choose your next move</strong><p>Attack starts a charge: release at the center for a strong hit. Item opens your potions; each restores 40 HP and uses a turn. Run can escape forest monsters, but guardians block your way.</p></div>
+      <div class="proof-card"><strong>Read the enemy. Time your strike. Protect the harvest.</strong><p>Attack starts a charge: release at the center for a strong hit. Item opens your potions; each restores 40 HP and uses a turn. Run can escape forest monsters, but guardians block your way.</p></div>
       <div class="proof-card"><strong>Bring the harvest home</strong><p>Follow the north path into Whispering Forest. Reach Level 3 for the northwest cavern. Defeat its Golem, reach Level 5, then take the northeast path to Ember Summit.</p></div>
       <div class="proof-card"><strong>If you fall</strong><p>You return to the village with full health and lose half your gold. Your level and quest progress stay with you. After an encounter, Battle details shows how your attacks went.</p></div>
       <button class="btn btn-primary" data-close="modal-guide">Back to the adventure</button>
     </div>
   </div>
 
+    <div id="game-notice" role="status" aria-live="polite" hidden></div>
+  </div>
     <script src="world.js"></script>
     <script src="combat.js"></script>
+    <script src="art-direction.js"></script>
     <script src="game.js"></script>
 </body>
 

@@ -32,7 +32,7 @@ class LocalImage extends NativeImage {
 const context={document,Image:LocalImage,console,performance:{now:()=>1000},window:{innerWidth:1200,addEventListener(){}},localStorage:{getItem:()=>null,setItem(){}},
   setTimeout(){},setInterval(){},clearInterval(){},requestAnimationFrame(){},cancelAnimationFrame(){},alert(){}};
 vm.createContext(context);
-for(const name of ['world.js','combat.js','game.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context);
+for(const name of ['world.js','combat.js','art-direction.js','game.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context);
 const run=code=>vm.runInContext(code,context);
 (async()=>{
   const output=path.join(root,'previews');fs.mkdirSync(output,{recursive:true});

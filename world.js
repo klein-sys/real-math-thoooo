@@ -24,11 +24,9 @@ const WORLD = {
       { x: 20, y: 1, w: 4, h: 1.4, to: 'forest', at: [21, 29], label: 'Whispering Forest', color: '#a7d9a1' },
       { x: 10.2, y: 12.6, w: 1.6, h: 1, to: 'elderHouse', at: [10, 13], label: 'Elder’s House', color: '#ead39b' },
       { x: 30.2, y: 12.6, w: 1.6, h: 1, to: 'smithHouse', at: [10, 13], label: 'Blacksmith', color: '#ead39b' }
-    ], buildings: [{x:8,y:8,w:6,h:5,doorX:11,label:'ELDER THALES', roof:'#536d85'}, {x:28,y:8,w:6,h:5,doorX:31,label:'THE FORGE',roof:'#8c4b45'}], props: [
-      {asset:'well',x:22,y:20.5,size:80,solid:true},{asset:'market_stall',x:30,y:22,size:120,solid:true},
-      {asset:'hay_bale',x:10,y:22,size:75,solid:true},{asset:'campfire',x:17,y:20,size:65,animated:true,solid:true},
-      {asset:'barrel',x:8,y:15,size:52,solid:true},{asset:'barrel',x:33,y:15,size:52,solid:true},
-      {asset:'crate_stack',x:32,y:23,size:65,solid:true}
+    ], buildings: [{x:6.4,y:6,w:9.6,h:6.5,doorX:11,label:'ELDER THALES', roof:'#536d85'}, {x:27,y:6,w:11,h:6.5,doorX:31,label:'THE FORGE',roof:'#8c4b45'}], props: [
+      {asset:'well',x:21.2,y:21.2,size:80,solid:true},
+      {asset:'market_stall',x:31.2,y:23,size:120,solid:true}
     ] },
   forest: { name: 'Whispering Forest', subtitle: 'Slimes stir between the ancient trees', width: 44, height: 34, kind: 'forest', spawn: [21,29],
     portals: [
@@ -54,6 +52,8 @@ const WORLD = {
       {asset:'fireplace',x:12,y:3,size:115,animated:true,solid:true},{asset:'barrel',x:16,y:10,size:76,solid:true}
     ] }
 };
+
+const SUPPLY_CACHES = [{map:'village',x:18,y:20,bit:1},{map:'forest',x:22,y:14,bit:2},{map:'cave',x:13,y:18,bit:4}];
 
 const entities = [
   { id:'elder',map:'elderHouse',x:10,y:7.8,type:'npc',name:'Elder Thales',emoji:'🧙‍♂️'},
@@ -144,7 +144,7 @@ function terrainAt(map,x,y) {
 function scenery(map) {
   if(map.scenery)return map.scenery;
   const list=[];
-  if(map.kind==='forest'||map.kind==='village') {
+  if(map.kind==='forest') {
     for(let y=2;y<map.height-2;y+=2.5)for(let x=2;x<map.width-2;x+=2.6) {
       const noise=Math.sin(x*39.7+y*17.3)*4375.5;
       if(Math.abs(x-22)<4||y<6||y>map.height-5)continue;
@@ -164,6 +164,7 @@ function isSolidTile(x,y,map=currentMap()) {
   if(map.kind==='interior' && (x<1.8||y<2.5||x>map.width-1.8||y>map.height-1))return true;
   if(map.buildings.some(b=>x>b.x-0.2&&x<b.x+b.w+0.2&&y>b.y&&y<b.y+b.h-0.2))return true;
   if(scenery(map).some(p=>Math.hypot(x-p.x,y-p.y)<p.radius+0.28))return true;
+  if(map.kind==='village' && ((x<4||x>40) || (y<4 && Math.abs(x-22)>2) || (y>26 && Math.abs(x-21)>2)))return true;
   if(map.props.some(p=>p.solid && Math.abs(x-p.x)<0.65 && Math.abs(y-p.y)<0.5))return true;
   return false;
 }
@@ -192,6 +193,8 @@ function updateLocation() {
 function nearbyTarget() {
   const close=entities.filter(entityVisible).map(e=>({entity:e,d:Math.hypot(e.x-gameState.playerX,e.y-gameState.playerY)})).filter(e=>e.d<1.9).sort((a,b)=>a.d-b.d);
   if(close.length)return {entity:close[0].entity};
+  const cache = SUPPLY_CACHES.find(item => item.map === gameState.mapId && !(gameState.supplies & item.bit) && Math.hypot(item.x-gameState.playerX,item.y-gameState.playerY)<1.8);
+  if(cache)return {cache};
   const portal=currentMap().portals.find(p=>gameState.playerX>p.x-0.7&&gameState.playerX<p.x+p.w+0.7&&gameState.playerY>p.y-0.7&&gameState.playerY<p.y+p.h+0.7);
   return portal?{portal}:null;
 }
@@ -207,14 +210,20 @@ function performInteraction() {
   const target=nearbyTarget();
   if(target?.entity)interactWithEntity(target.entity);
   else if(target?.portal)usePortal(target.portal);
+  else if(target?.cache) {
+    gameState.supplies |= target.cache.bit;
+    gameState.potions += 1; gameState.gold += 15;
+    saveGame(); updateUI();
+    showGameNotice('Supply cache found · +1 potion · +15 gold');
+  }
 }
 function checkProximityPrompt() {
   const target=nearbyTarget();
   const toast=document.getElementById('interact-toast');
   toast.style.display=target?'flex':'none';
-  document.getElementById('toast-icon').textContent=target?.portal?'↗':target?.entity?.type==='npc'?'✦':'⚔';
-  document.getElementById('toast-msg').textContent=target?.portal?`Enter ${target.portal.label}`:target?.entity?`${target.entity.type==='npc'?'Talk to':'Fight'} ${getCastMember(target.entity.id).name}`:'';
-  document.getElementById('d-action').textContent=target?.portal?'Enter':target?.entity?.type==='npc'?'Talk':'Action';
+  document.getElementById('toast-icon').textContent=target?.cache?'✦':target?.portal?'↗':target?.entity?.type==='npc'?'✦':'⚔';
+  document.getElementById('toast-msg').textContent=target?.cache?'Open supply cache · potion + 15 gold':target?.portal?`Enter ${target.portal.label}`:target?.entity?`${target.entity.type==='npc'?'Talk to':'Fight'} ${getCastMember(target.entity.id).name}`:'';
+  document.getElementById('d-action').textContent=target?.cache?'Open':target?.portal?'Enter':target?.entity?.type==='npc'?'Talk':'Action';
 }
 function interactWithEntity(ent) {
   if(modalIsOpen()||!entityVisible(ent))return;
@@ -222,8 +231,8 @@ function interactWithEntity(ent) {
   if(ent.id==='elder')openElderDialogue();
   else if(ent.id==='smith')openSmithDialogue();
   else {
-    if(ent.id==='golem'&&gameState.level<3){alert('Reach Level 3 by training in Whispering Forest first.');return;}
-    if(ent.id==='dragon'&&(!gameState.golemDefeated||gameState.level<5)){alert('Defeat the Stone Golem and reach Level 5 first.');return;}
+    if(ent.id==='golem'&&gameState.level<3){showGameNotice('Reach Level 3 by training in Whispering Forest first.');return;}
+    if(ent.id==='dragon'&&(!gameState.golemDefeated||gameState.level<5)){showGameNotice('Defeat the Stone Golem and reach Level 5 first.');return;}
     startBattle(ent);
   }
 }
@@ -231,7 +240,8 @@ function tryMove(dx,dy,dt=1/60) {
   if(modalIsOpen())return false;
   const length=Math.hypot(dx,dy);
   if(length<=0.08)return false;
-  const scale=3.8*dt/Math.max(1,length);
+  const speed = input.keys.has('shift') ? 5.7 : 3.8;
+  const scale = speed * dt / Math.max(1, length);
   let moved=false;
   const nx=gameState.playerX+dx*scale,ny=gameState.playerY+dy*scale;
   if(canStand(nx,gameState.playerY)){gameState.playerX=nx;moved=true;}
@@ -304,28 +314,38 @@ function renderMap() {
   ctx.save();ctx.translate(-Math.round(camera.x),-Math.round(camera.y));
   const x0=Math.max(0,Math.floor(camera.x/TILE_SIZE)),y0=Math.max(0,Math.floor(camera.y/TILE_SIZE));
   for(let y=y0;y<Math.min(map.height,y0+Math.ceil(h/TILE_SIZE)+1);y++)for(let x=x0;x<Math.min(map.width,x0+Math.ceil(w/TILE_SIZE)+1);x++) {
-    const tile=terrainAt(map,x,y),dungeon=tile.startsWith('tile_dungeon')||tile==='tile_dirt';
+    const tile=terrainAt(map,x,y);
     ctx.fillStyle=map.kind==='interior'?'#544335':map.kind==='cave'?'#333742':map.kind==='volcano'?'#3e3034':'#487a47';
     ctx.fillRect(x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
-    blit(ctx,(dungeon?DUNGEON:MEDIEVAL)+tile+'.png',x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
+    paintGround(ctx,map.kind,tile==='tile_dirt'||tile==='tile_cobble',x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE);
     if((x===0||y===0||x===map.width-1||y===map.height-1)&&map.kind!=='village'&&map.kind!=='forest') {
       blit(ctx,(map.kind==='interior'?MEDIEVAL+'tile_wall':DUNGEON+'tile_dungeon_wall')+'.png',x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
     }
+  }
+  if(map.kind==='village') {
+    blit(ctx, ART_ROOT+'emberbrook/village.png', 0, 0, map.width*TILE_SIZE, map.height*TILE_SIZE);
   }
   if(map.kind==='volcano') {
     for(let y=3;y<map.height-3;y+=0.5){ctx.fillStyle=`rgba(245,91,39,${0.4+Math.sin(worldClock*2+y)*0.15})`;ctx.fillRect(2*TILE_SIZE,y*TILE_SIZE,26,19);ctx.fillRect((map.width-3)*TILE_SIZE,y*TILE_SIZE,26,19);}
   }
   if(map.kind==='interior')blit(ctx,MEDIEVAL+'tile_carpet.png',8*TILE_SIZE,7*TILE_SIZE,4*TILE_SIZE,7*TILE_SIZE);
   const objects=[];
-  scenery(map).forEach(p=>objects.push({y:p.y,draw:()=>{
+  (map.kind==='village'?[]:scenery(map)).forEach(p=>objects.push({y:p.y,draw:()=>{
     if(p.kind==='tree')drawTree(p.x*TILE_SIZE,p.y*TILE_SIZE,1.1);
     else blit(ctx,DUNGEON+'rubble_pile.png',p.x*TILE_SIZE-40,p.y*TILE_SIZE-55,80,70);
   }}));
-  map.buildings.forEach(b=>objects.push({y:b.y+b.h,draw:()=>drawBuilding(b)}));
-  const props=[...map.props];
+  (map.kind==='village'?[]:map.buildings).forEach(b=>objects.push({y:b.y+b.h,draw:()=>drawBuilding(b)}));
+  const props=map.kind==='village'?[]:[...map.props];
   if(map.kind==='cave')props.push({asset:'crystals',x:7,y:10,size:95,animated:true,dungeon:true},{asset:'crystals',x:21,y:14,size:100,animated:true,dungeon:true},{asset:'altar',x:14,y:5,size:120,dungeon:true});
   if(map.kind==='volcano')props.push({asset:'brazier',x:9,y:9,size:100,animated:true},{asset:'brazier',x:23,y:9,size:100,animated:true},{asset:'treasure_pile',x:16,y:4,size:100,dungeon:true});
-  props.forEach(p=>objects.push({y:p.y,draw:()=>blit(ctx,(p.dungeon?DUNGEON:MEDIEVAL)+p.asset+(p.animated?'_'+Math.floor(worldClock*7)%6:'')+'.png',p.x*TILE_SIZE-p.size/2,p.y*TILE_SIZE-p.size*0.86,p.size,p.size)}));
+  props.forEach(p=>objects.push({y:p.y,draw:()=>blit(ctx,(p.dungeon?DUNGEON:MEDIEVAL)+p.asset+(p.animated?'_'+Math.floor(worldClock*7)%6:'')+'.png',p.x*TILE_SIZE-p.size/2,p.y*TILE_SIZE-p.size*0.95,p.size,p.size)}));
+  SUPPLY_CACHES.filter(item=>item.map===gameState.mapId && !(gameState.supplies & item.bit)).forEach(item=>objects.push({y:item.y,draw:()=>{
+    const x=item.x*TILE_SIZE,y=item.y*TILE_SIZE;
+    ctx.fillStyle='#ddad54';ctx.fillRect(x-12,y-16,24,16);
+    ctx.strokeStyle='#65472c';ctx.lineWidth=3;ctx.strokeRect(x-12,y-16,24,16);
+    ctx.fillStyle='#fff2b3';ctx.fillRect(x-2,y-10,4,6);
+    ctx.font='14px monospace';ctx.textAlign='center';ctx.fillText('✦',x,y-23+Math.sin(worldClock*3)*3);
+  }}));
   entities.filter(entityVisible).forEach(ent=>objects.push({y:ent.y,draw:()=>{
     const size=ent.id==='dragon'?155:ent.id==='golem'?120:ent.type==='npc'?50:60;
     const x=ent.x*TILE_SIZE,y=ent.y*TILE_SIZE;
@@ -341,7 +361,7 @@ function renderMap() {
   objects.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
   map.portals.forEach(p=>{
     const x=(p.x+p.w/2)*TILE_SIZE,y=(p.y+p.h/2)*TILE_SIZE;
-    ctx.strokeStyle=p.color;ctx.lineWidth=2;ctx.strokeRect(p.x*TILE_SIZE,p.y*TILE_SIZE,p.w*TILE_SIZE,p.h*TILE_SIZE);
+    ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(x,y,4+Math.sin(worldClock*3),0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#101c28dd';const labelWidth=p.label.length*6+16;ctx.fillRect(x-labelWidth/2,y-37,labelWidth,21);
     ctx.fillStyle=p.color;ctx.textAlign='center';ctx.font='10px monospace';ctx.fillText(p.label,x,y-23);
   });
@@ -354,7 +374,7 @@ function renderMap() {
   drawMinimap(map);
 }
 function drawMinimap(map) {
-  const width=118,height=80,x=canvas.width-width-14,y=14;
+  const width=118,height=80,x=canvas.width-width-14,y=canvas.height-height-14;
   ctx.fillStyle='#101b27dd';ctx.fillRect(x,y,width,height);ctx.strokeStyle='#b09d6877';ctx.strokeRect(x,y,width,height);
   ctx.fillStyle='#b8c7b5';ctx.font='9px monospace';ctx.textAlign='left';ctx.fillText('REGION',x+8,y+13);
   map.portals.forEach(p=>{ctx.fillStyle=p.color;ctx.fillRect(x+8+p.x/map.width*100,y+22+p.y/map.height*48,4,4);});
@@ -370,7 +390,11 @@ function initWorld() {
   }
   updateLocation();
   function resizeCanvas() {
-    canvas.width=window.innerWidth<=700?640:960;canvas.height=640;renderMap();
+    const bounds = canvas.getBoundingClientRect();
+    const scale = Math.max(1.5, bounds.height / 480, bounds.width / 850);
+    canvas.width = Math.round(bounds.width / scale);
+    canvas.height = Math.round(bounds.height / scale);
+    renderMap();
   }
   resizeCanvas();
   window.addEventListener('resize',resizeCanvas);
@@ -380,7 +404,7 @@ function initWorld() {
     if((key===' '||key==='enter')&&e.target.closest('button'))return;
     if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(key))e.preventDefault();
     if(modalIsOpen())return;
-    if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(key))input.keys.add(key);
+    if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift'].includes(key))input.keys.add(key);
     if((key===' '||key==='e')&&!e.repeat)performInteraction();
   });
   window.addEventListener('keyup',e=>input.keys.delete(e.key.toLowerCase()));

@@ -33,7 +33,7 @@ The goal is to defeat the dragon and bring the harvest home. The victory screen 
 | Stonebound Cavern | First boss encounter |
 | Ember Summit | Final boss and story resolution |
 
-Story roles are the hero, Elder, smith, slimes, goblins, Golem and dragon. These are character roles, not a required number of group members. Display names can be customized.
+Story roles are the hero, Elder, smith, slimes, goblins, Golem and dragon. These are character roles, not a required number of group members. Character identities are fixed. Older customized saves use the canonical story names.
 
 ## Player loop
 
@@ -60,11 +60,15 @@ Slimes slow the charge, goblins poison, the Golem damages armor, and the dragon 
 
 After a battle, the report shows the outcome, rewards and optional Battle details: attacks, critical hits and damage. Formula explanations are paused.
 
+**Guard:** spend a turn to reduce direct damage by 65% and add 35% power to the next attack. Enemy intent previews the base incoming damage.
+
+**Exploration rewards:** three permanent supply caches offer a potion and 15 gold each. Shift sprints on keyboard. Village collision and doorway positions follow the illustrated backdrop.
+
 ## Winning, losing and saving
 
 Winning means defeating the dragon and returning the harvest. Losing returns the hero to the village with full health and half their gold. Levels and quest progress remain.
 
-Existing saves retain progression, inventory, gold, debt and cast names. Legacy build allocations remain stored for compatibility but have no effect on active combat. The current version saves the region and continuous position.
+Existing saves retain progression, inventory, gold and debt. Legacy build allocations remain stored for compatibility but have no effect on active combat. The current version saves the region and continuous position.
 
 ## Next design work
 
@@ -87,3 +91,5 @@ The game title does not need to name the concept. The final explanation must mat
 ## Validation
 
 The automated checks cover exploration, reachable exits/NPCs, saves, combat turns, boss progression, guides and reports. They also verify that active combat does not call the paused calculus functions. Offline map/battle images have been inspected; browser layout and device testing remain outstanding.
+
+The interface now lives inside the game screen: HUD, objectives, character directory, menus, battles and notifications. Village warmth and readable action feedback draw inspiration from Stardew Valley and Soul Knight while retaining Emberbrook’s own story and existing turn-based combat.
