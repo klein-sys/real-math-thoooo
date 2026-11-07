@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Emberbrook: The Lost Harvest — Gameplay Prototype</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -838,7 +838,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="rpg.css?v=emberbrook-2">
+  <link rel="stylesheet" href="rpg.css?v=emberbrook-regions-1">
 </head>
 
 <body>
@@ -886,6 +886,7 @@
         <button id="btn-forge" class="btn btn-accent" title="Paused course draft" hidden>
           ⚔️ Forge <span id="ui-forge-ratio" class="mono-font" style="font-size:11px;">[5:5]</span>
         </button>
+        <button id="btn-map" class="btn" title="Open region map (M)">Map</button>
         <button id="btn-guide" class="btn btn-math" title="Controls, travel, and battles">
           📖 How to play
         </button>
@@ -915,7 +916,7 @@
         <div class="location-plaque"><span class="eyebrow">YOU ARE EXPLORING</span><strong id="location-name">Emberbrook Village</strong><span id="location-description">A quiet refuge beneath the mountains</span></div>
         <div class="touch-controls"><div id="joystick" role="group" aria-label="Movement joystick"><span class="joystick-ring"></span><span id="joystick-knob"></span></div><button id="d-action" class="interact-button">Action</button></div>
         <div id="interact-toast">
-          <span id="toast-icon">💬</span> <span id="toast-msg">Press [SPACE] or tap to talk</span>
+          <kbd class="interaction-key">E</kbd><span id="toast-icon">💬</span> <span id="toast-msg">Press [SPACE] or tap to talk</span>
         </div>
       </div>
 
@@ -1261,6 +1262,21 @@
     </div>
   </div>
 
+  <div id="modal-region-map" class="modal-overlay">
+    <div class="modal-box atlas" role="dialog" aria-labelledby="atlas-title">
+      <div class="modal-header"><div class="modal-title" id="atlas-title">Emberbrook trail map</div>
+        <button class="close-btn" data-close="modal-region-map" aria-label="Close map">×</button>
+      </div>
+      <div class="atlas-route">
+        <div class="atlas-region atlas-cave"><i aria-hidden="true">◆</i><strong>Stonebound Cavern</strong><small id="map-state-cave"></small></div>
+        <div class="atlas-region atlas-summit"><i aria-hidden="true">▲</i><strong>Ember Summit</strong><small id="map-state-volcano"></small></div>
+        <div class="atlas-region atlas-forest"><i aria-hidden="true">♠</i><strong>Whispering Forest</strong><small id="map-state-forest"></small></div>
+        <div class="atlas-region atlas-village"><i aria-hidden="true">⌂</i><strong>Emberbrook</strong><small id="map-state-village"></small></div>
+      </div>
+      <p>Follow the forest trail to the fork. The cavern is northwest and the summit is northeast.</p>
+      <button class="btn btn-primary" data-close="modal-region-map">Return to game</button>
+    </div>
+  </div>
   <div id="modal-guide" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
       <div class="modal-header">
@@ -1278,10 +1294,10 @@
 
     <div id="game-notice" role="status" aria-live="polite" hidden></div>
   </div>
-    <script src="world.js?v=emberbrook-2"></script>
-    <script src="combat.js?v=emberbrook-2"></script>
-    <script src="art-direction.js?v=emberbrook-2"></script>
-    <script src="game.js?v=emberbrook-2"></script>
+    <script src="world.js?v=emberbrook-regions-1"></script>
+    <script src="combat.js?v=emberbrook-regions-1"></script>
+    <script src="art-direction.js?v=emberbrook-regions-1"></script>
+    <script src="game.js?v=emberbrook-regions-1"></script>
 </body>
 
 </html>

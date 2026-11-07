@@ -11,6 +11,7 @@ function element(id='') {
   if(['gameCanvas','forgeCanvas','battle-scene'].includes(id)) {
     const surface=createCanvas(id==='gameCanvas'?960:id==='battle-scene'?720:600,id==='gameCanvas'?640:id==='battle-scene'?280:180);
     Object.defineProperties(el,{width:{get:()=>surface.width,set:v=>surface.width=v},height:{get:()=>surface.height,set:v=>surface.height=v}});
+    el.getBoundingClientRect=()=>({width:960,height:640});
     el.getContext=()=>surface.getContext('2d');el.surface=surface;
   }
   return el;

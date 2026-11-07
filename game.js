@@ -1011,7 +1011,17 @@ function executePlayerStrike(t) {
   // Enemy Turn
   activeBattle.playerTurn = false;
   syncBattleActions();
-  setTimeout(enemyTurn, 1000);
+  queueEnemyTurn(1000);
+}
+
+function queueEnemyTurn(delay) {
+  const encounter = activeBattle;
+  encounter.enemyWarning = true;
+  setTimeout(() => {
+    if (activeBattle !== encounter) return;
+    encounter.enemyWarning = false;
+    enemyTurn();
+  }, delay);
 }
 
 function enemyTurn() {
@@ -1131,7 +1141,7 @@ function usePotion() {
   activeBattle.playerTurn = false;
   syncBattleActions();
   saveGame();
-  setTimeout(enemyTurn, 1000);
+  queueEnemyTurn(1000);
 }
 
 function handleBattleVictory() {
@@ -1272,6 +1282,7 @@ function openModal(id) {
 
 function closeModal(id) {
   document.getElementById(id).style.display = 'none';
+  if (id === 'modal-region-map') document.getElementById('btn-map').focus?.();
   if (id === 'modal-battle') {
     activeBattle = null;
     resetGauge();
@@ -1283,6 +1294,43 @@ document.querySelectorAll('[data-close]').forEach(btn => {
   btn.addEventListener('click', () => {
     closeModal(btn.getAttribute('data-close'));
   });
+});
+
+function toggleRegionMap() {
+  const panel = document.getElementById('modal-region-map');
+  if (panel.style.display === 'flex') {
+    closeModal(panel.id);
+    return;
+  }
+  if (modalIsOpen()) return;
+  const region = currentMap().kind === 'interior' ? 'village' : gameState.mapId;
+  const states = {
+    village: 'Open · rest and resupply',
+    forest: 'Open · trail junction',
+    cave: gameState.golemDefeated ? 'Guardian defeated' : gameState.level >= 3 ? 'Guardian available' : 'Guardian requires Level 3',
+    volcano: gameState.dragonDefeated ? 'Harvest recovered' : summitUnlocked() ? 'Open · dragon arena' : 'Locked · defeat Golem and reach Lv 5'
+  };
+  for (const [id, status] of Object.entries(states)) {
+    const label = document.getElementById('map-state-' + id);
+    label.textContent = id === region ? 'You are here · ' + status : status;
+    label.parentElement?.classList.toggle('atlas-current', id === region);
+  }
+  openModal(panel.id);
+  panel.querySelector('[data-close]')?.focus();
+}
+document.getElementById('btn-map').addEventListener('click', toggleRegionMap);
+document.addEventListener('keydown', event => {
+  const panel = document.getElementById('modal-region-map');
+  if (panel.style.display !== 'flex') return;
+  if (event.key === 'Escape') toggleRegionMap();
+  if (event.key === 'Tab') {
+    const buttons = [...panel.querySelectorAll('button')];
+    const index = buttons.indexOf(document.activeElement);
+    const next = index < 0 ? (event.shiftKey ? buttons.length - 1 : 0) :
+      (index + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length;
+    event.preventDefault();
+    buttons[next].focus();
+  }
 });
 
 // Top bar buttons
@@ -1392,6 +1440,6 @@ function guardTurn() {
   activeBattle.playerTurn = false;
   logBattle('Guard raised. Take 65% less direct damage, then strike with 35% more power.');
   syncBattleActions();
-  setTimeout(enemyTurn, 550);
+  queueEnemyTurn(550);
 }
 document.getElementById('btn-battle-guard').addEventListener('click', guardTurn);

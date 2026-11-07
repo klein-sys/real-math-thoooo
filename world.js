@@ -53,6 +53,10 @@ const WORLD = {
     ] }
 };
 
+WORLD.forest.landmarks = [{x:8,y:7,kind:'crystal',label:'Waystone · Cavern northwest'}];
+WORLD.cave.landmarks = [{x:8,y:11,kind:'crystal'},{x:20,y:14,kind:'crystal'},{x:14,y:4,kind:'crystal'}];
+WORLD.volcano.landmarks = [{x:9,y:10,kind:'brazier'},{x:23,y:10,kind:'brazier'}];
+
 const SUPPLY_CACHES = [{map:'village',x:18,y:20,bit:1},{map:'forest',x:22,y:14,bit:2},{map:'cave',x:13,y:18,bit:4}];
 
 const entities = [
@@ -112,12 +116,13 @@ function drawCharacter(context,id,x,y,size,state='idle',flip=false,elapsed=world
     const action=state==='walk'?'hop':['attack','hurt','death'].includes(state)?state:'idle';
     const count={idle:5,hop:9,attack:9,hurt:5,death:9}[action];
     ok=drawStrip(context,ART_ROOT+`slime_essentials_4_slimes_v1/assets/animations/blue_slime/blue_slime_${action}_64x64_${count}f.png`,count,x,y,size,flip,10,0.77,!['attack','hurt','death'].includes(action),elapsed);
-  } else if(id==='golem'||id==='dragon') {
-    const dragon=id==='dragon';
-    const folder=dragon?'Emberwing_Dragon/ember/':'Rune_Golem/crystal/';
-    const action=state==='attack'?(dragon?'fire_breath':'slam'):state;
-    const count={idle:8,walk:8,hurt:4,death:8,slam:8,fire_breath:10}[action]||8;
-    ok=drawStrip(context,CREATURES+folder+action+'_sheet.png',count,x,y,size,flip,10,dragon?0.793:0.957,!['attack','hurt','death'].includes(state),elapsed);
+  } else if(id==='dragon') {
+    paintDragon(context,x,y,size,state,flip,elapsed);
+    ok=true;
+  } else if(id==='golem') {
+    const action=state==='attack'?'slam':state;
+    const count=action==='hurt'?4:8;
+    ok=drawStrip(context,CREATURES+'Rune_Golem/crystal/'+action+'_sheet.png',count,x,y,size,flip,10,0.957,!['attack','hurt','death'].includes(state),elapsed);
   } else if(id.startsWith('goblin')||id==='elder'||id==='smith') {
     const sprite=id==='elder'?'sprWizard':id==='smith'?'sprLizardMonk1':'sprGoblin1';
     // The wizard sheet contains seven distinct poses; keep its standing pose.
@@ -147,20 +152,22 @@ function scenery(map) {
   if(map.kind==='forest') {
     for(let y=2;y<map.height-2;y+=2.5)for(let x=2;x<map.width-2;x+=2.6) {
       const noise=Math.sin(x*39.7+y*17.3)*4375.5;
-      if(Math.abs(x-22)<4||y<6||y>map.height-5)continue;
-      if(map.kind==='village' && x>5&&x<38&&y>5&&y<25)continue;
-      if(noise-Math.floor(noise)>(map.kind==='forest'?0.32:0.45)) list.push({x,y,kind:'tree',radius:0.38});
+      if(y<5||y>map.height-4||[-1,0,1].some(dx=>[-1,0,1].some(dy=>regionTile('forest',x+dx,y+dy)==='trail')))continue;
+      if(noise-Math.floor(noise)>0.32) list.push({x,y,kind:'tree',radius:0.38});
     }
   }
   if(map.kind==='cave'||map.kind==='volcano') {
     for(let y=4;y<map.height-3;y+=4) {
-      list.push({x:3.5,y,kind:'rock',radius:0.6},{x:map.width-4,y:y+1,kind:'rock',radius:0.6});
+      const inset=map.kind==='volcano'?5.7:3.5;
+      list.push({x:inset,y,kind:'rock',radius:0.6},{x:map.width-inset-.5,y:y+1,kind:'rock',radius:0.6});
     }
   }
   map.scenery=list;return list;
 }
 function isSolidTile(x,y,map=currentMap()) {
   if(x<1||y<1||x>map.width-1||y>map.height-1)return true;
+  if(['wall','lava'].includes(regionTile(map.kind,Math.floor(x),Math.floor(y))))return true;
+  if(map.landmarks?.some(item=>Math.hypot(x-item.x,y-item.y)<.55))return true;
   if(map.kind==='interior' && (x<1.8||y<2.5||x>map.width-1.8||y>map.height-1))return true;
   if(map.buildings.some(b=>x>b.x-0.2&&x<b.x+b.w+0.2&&y>b.y&&y<b.y+b.h-0.2))return true;
   if(scenery(map).some(p=>Math.hypot(x-p.x,y-p.y)<p.radius+0.28))return true;
@@ -198,9 +205,14 @@ function nearbyTarget() {
   const portal=currentMap().portals.find(p=>gameState.playerX>p.x-0.7&&gameState.playerX<p.x+p.w+0.7&&gameState.playerY>p.y-0.7&&gameState.playerY<p.y+p.h+0.7);
   return portal?{portal}:null;
 }
+function summitUnlocked() {
+  return gameState.golemDefeated && gameState.level >= 5;
+}
+function portalLocked(portal) {
+  return portal.gate === 'dragon' && !summitUnlocked();
+}
 function usePortal(portal) {
-  if(portal.gate==='dragon'&&(!gameState.golemDefeated||gameState.level<5)) {
-    document.getElementById('toast-msg').textContent='Defeat the Golem and reach Level 5 to enter.';
+  if(portalLocked(portal)) {
     portalCooldown=1.5;return;
   }
   enterMap(portal.to,...portal.at);
@@ -222,7 +234,8 @@ function checkProximityPrompt() {
   const toast=document.getElementById('interact-toast');
   toast.style.display=target?'flex':'none';
   document.getElementById('toast-icon').textContent=target?.cache?'✦':target?.portal?'↗':target?.entity?.type==='npc'?'✦':'⚔';
-  document.getElementById('toast-msg').textContent=target?.cache?'Open supply cache · potion + 15 gold':target?.portal?`Enter ${target.portal.label}`:target?.entity?`${target.entity.type==='npc'?'Talk to':'Fight'} ${getCastMember(target.entity.id).name}`:'';
+  document.getElementById('toast-msg').textContent=target?.portal && portalLocked(target.portal)?'Summit locked · defeat the Golem and reach Level 5':target?.cache?'Open supply cache · potion + 15 gold':target?.portal?`Enter ${target.portal.label}`:target?.entity?`${target.entity.type==='npc'?'Talk to':'Fight'} ${getCastMember(target.entity.id).name}`:'';
+  document.getElementById('d-action').hidden=!target;
   document.getElementById('d-action').textContent=target?.cache?'Open':target?.portal?'Enter':target?.entity?.type==='npc'?'Talk':'Action';
 }
 function interactWithEntity(ent) {
@@ -232,7 +245,7 @@ function interactWithEntity(ent) {
   else if(ent.id==='smith')openSmithDialogue();
   else {
     if(ent.id==='golem'&&gameState.level<3){showGameNotice('Reach Level 3 by training in Whispering Forest first.');return;}
-    if(ent.id==='dragon'&&(!gameState.golemDefeated||gameState.level<5)){showGameNotice('Defeat the Stone Golem and reach Level 5 first.');return;}
+    if(ent.id==='dragon'&&!summitUnlocked()){showGameNotice('Defeat the Stone Golem and reach Level 5 first.');return;}
     startBattle(ent);
   }
 }
@@ -283,10 +296,12 @@ function drawTree(x,y,scale=1) {
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   ctx.fillStyle='#0b1f20aa';ctx.beginPath();ctx.ellipse(0,1,22,9,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#513c2f';ctx.fillRect(-5,-30,10,32);ctx.fillStyle='#76503a';ctx.fillRect(-3,-30,3,30);
-  for(const [dy,w,c] of [[-27,30,'#183b32'],[-43,27,'#225440'],[-57,21,'#2e6549'],[-69,14,'#3c7653']]) {
-    ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(0,dy-21);ctx.lineTo(w,dy+12);ctx.lineTo(-w,dy+12);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#75a86222';ctx.fillRect(-w/2,dy+5,w/2,3);
-  }
+  const crown=[[-34,-30],[-39,-47],[-31,-54],[-30,-67],[-18,-71],[-12,-81],[8,-81],[15,-73],[27,-72],[35,-62],[35,-54],[43,-46],[39,-30],[30,-25],[15,-28],[9,-21],[-12,-23],[-19,-29]];
+  polygon(ctx,'#203f33',crown);
+  polygon(ctx,'#41643a',[[-34,-43],[-25,-58],[-21,-68],[-9,-68],[-5,-77],[8,-77],[15,-65],[28,-66],[31,-53],[37,-45],[29,-33],[13,-37],[4,-28],[-9,-31],[-17,-38],[-28,-34]]);
+  polygon(ctx,'#63834a',[[-27,-52],[-15,-65],[-7,-62],[-1,-74],[8,-74],[14,-62],[27,-58],[23,-47],[9,-49],[3,-39],[-12,-42],[-17,-50]]);
+  ctx.fillStyle='#8ba457';
+  ctx.fillRect(-11,-65,8,3);ctx.fillRect(2,-69,6,4);ctx.fillRect(13,-56,8,3);
   ctx.restore();
 }
 function drawBuilding(b) {
@@ -314,30 +329,33 @@ function renderMap() {
   ctx.save();ctx.translate(-Math.round(camera.x),-Math.round(camera.y));
   const x0=Math.max(0,Math.floor(camera.x/TILE_SIZE)),y0=Math.max(0,Math.floor(camera.y/TILE_SIZE));
   for(let y=y0;y<Math.min(map.height,y0+Math.ceil(h/TILE_SIZE)+1);y++)for(let x=x0;x<Math.min(map.width,x0+Math.ceil(w/TILE_SIZE)+1);x++) {
-    const tile=terrainAt(map,x,y);
-    ctx.fillStyle=map.kind==='interior'?'#544335':map.kind==='cave'?'#333742':map.kind==='volcano'?'#3e3034':'#487a47';
-    ctx.fillRect(x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
-    paintGround(ctx,map.kind,tile==='tile_dirt'||tile==='tile_cobble',x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE);
-    if((x===0||y===0||x===map.width-1||y===map.height-1)&&map.kind!=='village'&&map.kind!=='forest') {
+    const regional = regionTile(map.kind,x,y);
+    if(regional) paintRegionTile(ctx,regional,x*TILE_SIZE,y*TILE_SIZE,worldClock);
+    else paintGround(ctx,map.kind,terrainAt(map,x,y)==='tile_cobble',x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE);
+    if((x===0||y===0||x===map.width-1||y===map.height-1)&&map.kind==='interior') {
       blit(ctx,(map.kind==='interior'?MEDIEVAL+'tile_wall':DUNGEON+'tile_dungeon_wall')+'.png',x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
     }
   }
   if(map.kind==='village') {
     blit(ctx, ART_ROOT+'emberbrook/village.png', 0, 0, map.width*TILE_SIZE, map.height*TILE_SIZE);
   }
-  if(map.kind==='volcano') {
-    for(let y=3;y<map.height-3;y+=0.5){ctx.fillStyle=`rgba(245,91,39,${0.4+Math.sin(worldClock*2+y)*0.15})`;ctx.fillRect(2*TILE_SIZE,y*TILE_SIZE,26,19);ctx.fillRect((map.width-3)*TILE_SIZE,y*TILE_SIZE,26,19);}
-  }
   if(map.kind==='interior')blit(ctx,MEDIEVAL+'tile_carpet.png',8*TILE_SIZE,7*TILE_SIZE,4*TILE_SIZE,7*TILE_SIZE);
   const objects=[];
   (map.kind==='village'?[]:scenery(map)).forEach(p=>objects.push({y:p.y,draw:()=>{
-    if(p.kind==='tree')drawTree(p.x*TILE_SIZE,p.y*TILE_SIZE,1.1);
+    if(p.kind==='tree')drawTree(p.x*TILE_SIZE,p.y*TILE_SIZE,0.83+(Math.floor(p.x*7+p.y*13)%6)*.075);
     else blit(ctx,DUNGEON+'rubble_pile.png',p.x*TILE_SIZE-40,p.y*TILE_SIZE-55,80,70);
   }}));
   (map.kind==='village'?[]:map.buildings).forEach(b=>objects.push({y:b.y+b.h,draw:()=>drawBuilding(b)}));
   const props=map.kind==='village'?[]:[...map.props];
-  if(map.kind==='cave')props.push({asset:'crystals',x:7,y:10,size:95,animated:true,dungeon:true},{asset:'crystals',x:21,y:14,size:100,animated:true,dungeon:true},{asset:'altar',x:14,y:5,size:120,dungeon:true});
-  if(map.kind==='volcano')props.push({asset:'brazier',x:9,y:9,size:100,animated:true},{asset:'brazier',x:23,y:9,size:100,animated:true},{asset:'treasure_pile',x:16,y:4,size:100,dungeon:true});
+  for(const item of map.landmarks||[]) {
+    objects.push({y:item.y,draw:()=>{
+      paintLandmark(ctx,item);
+      if(item.label) {
+        ctx.fillStyle='#f4e4aa';ctx.textAlign='center';ctx.font='bold 11px monospace';
+        ctx.fillText(item.label,item.x*TILE_SIZE,item.y*TILE_SIZE-48);
+      }
+    }});
+  }
   props.forEach(p=>objects.push({y:p.y,draw:()=>blit(ctx,(p.dungeon?DUNGEON:MEDIEVAL)+p.asset+(p.animated?'_'+Math.floor(worldClock*7)%6:'')+'.png',p.x*TILE_SIZE-p.size/2,p.y*TILE_SIZE-p.size*0.95,p.size,p.size)}));
   SUPPLY_CACHES.filter(item=>item.map===gameState.mapId && !(gameState.supplies & item.bit)).forEach(item=>objects.push({y:item.y,draw:()=>{
     const x=item.x*TILE_SIZE,y=item.y*TILE_SIZE;
@@ -371,16 +389,8 @@ function renderMap() {
     ctx.fillStyle=map.kind==='volcano'?'#ffb16a99':'#e6dca844';ctx.fillRect(x,y,2,2);
   }
   ctx.restore();
-  drawMinimap(map);
-}
-function drawMinimap(map) {
-  const width=118,height=80,x=canvas.width-width-14,y=canvas.height-height-14;
-  ctx.fillStyle='#101b27dd';ctx.fillRect(x,y,width,height);ctx.strokeStyle='#b09d6877';ctx.strokeRect(x,y,width,height);
-  ctx.fillStyle='#b8c7b5';ctx.font='9px monospace';ctx.textAlign='left';ctx.fillText('REGION',x+8,y+13);
-  map.portals.forEach(p=>{ctx.fillStyle=p.color;ctx.fillRect(x+8+p.x/map.width*100,y+22+p.y/map.height*48,4,4);});
-  ctx.fillStyle='#fff2bf';ctx.beginPath();ctx.arc(x+8+gameState.playerX/map.width*100,y+22+gameState.playerY/map.height*48,3,0,Math.PI*2);ctx.fill();
-}
 
+}
 function initWorld() {
   if(gameState.worldVersion!==3||!WORLD[gameState.mapId]) {
     gameState.worldVersion=3;gameState.mapId='village';[gameState.playerX,gameState.playerY]=WORLD.village.spawn;
@@ -391,16 +401,26 @@ function initWorld() {
   updateLocation();
   function resizeCanvas() {
     const bounds = canvas.getBoundingClientRect();
-    const scale = Math.max(1.5, bounds.height / 480, bounds.width / 850);
-    canvas.width = Math.round(bounds.width / scale);
-    canvas.height = Math.round(bounds.height / scale);
+    const width = Math.max(1, bounds.width);
+    const height = Math.max(1, bounds.height);
+    const scale = Math.min(width / 320, Math.max(1, height / 480, width / 850));
+    canvas.width = Math.round(width / scale);
+    canvas.height = Math.round(height / scale);
     renderMap();
   }
   resizeCanvas();
-  window.addEventListener('resize',resizeCanvas);
+  if (typeof ResizeObserver !== 'undefined') {
+    const hud = document.querySelector('.top-bar');
+    const quest = document.querySelector('.quest-banner');
+    new ResizeObserver(() => { quest.style.top = (hud.offsetTop + hud.offsetHeight + 10) + 'px'; }).observe(hud);
+  }
+  window.addEventListener('resize',()=>{clearMovement();resizeCanvas();});
+  document.addEventListener('pointerdown',e=>{ if(e.pointerType) document.body.dataset.input=e.pointerType; });
   window.addEventListener('keydown',e=>{
     if(e.target.closest('input, textarea, select, [contenteditable="true"]'))return;
     const key=e.key.toLowerCase();
+    if(document.body.dataset) document.body.dataset.input='keyboard';
+    if(key==='m'&&!e.repeat){toggleRegionMap();return;}
     if((key===' '||key==='enter')&&e.target.closest('button'))return;
     if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(key))e.preventDefault();
     if(modalIsOpen())return;
@@ -410,7 +430,16 @@ function initWorld() {
   window.addEventListener('keyup',e=>input.keys.delete(e.key.toLowerCase()));
   window.addEventListener('blur',()=>{clearMovement();saveGame();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){clearMovement();saveGame();}});
-  document.getElementById('d-action').addEventListener('click',performInteraction);
+  const action = document.getElementById('d-action');
+  action.addEventListener('click', event => {
+    if (!(event?.pointerType === 'touch' && event.isPrimary === false)) performInteraction();
+  });
+  action.addEventListener('pointerdown', event => {
+    if (event.pointerType === 'touch' && !event.isPrimary) {
+      event.preventDefault();
+      performInteraction();
+    }
+  });
   document.getElementById('interact-toast').addEventListener('click',performInteraction);
   const stick=document.getElementById('joystick');
   function movePointer(e) {

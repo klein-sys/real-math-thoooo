@@ -82,6 +82,14 @@ These are priorities for the next design pass, not new features already implemen
 
 Extra classes, more regions, equipment systems and additional bosses remain optional. Keep the scope small enough for the group to finish and explain.
 
+## Regional art, travel, and input
+
+The forest trail splits toward the cavern and summit. A crystal waystone marks the cavern branch. Cavern pavers lead from the entrance to the guardian, and summit braziers frame a ring of basalt surrounded by impassable lava. Landmarks share world positions with collision, and actors and scenery sort by their ground position.
+
+The trail map (M or Map) shows the current region, the route through the forest, and the existing guardian and summit requirements. It does not warp the player. The dragon's warning marks the hero's position before the scheduled strike. The encounter still resolves attacks by turn and has no positional dodge hitbox.
+
+Tiny Wonder Farm supplied reference for foliage and warm color, Pixel Crawler for cool masonry, 2D Pixel Dungeon for floor and wall separation, and MediavelFree for panel framing. Original canvas art supplies the new regions and dragon. No files from those reference archives are shipped by this pass.
+
 ## Group decision before course integration
 
 Bring the actual lesson/topic list to the discussion. Choose one concept the group understands, agree how it changes a player decision or outcome, and work through one numerical example together. Then replace the relevant prototype rule and verify it in the game.
@@ -90,8 +98,10 @@ The game title does not need to name the concept. The final explanation must mat
 
 ## Validation
 
-The automated checks cover exploration, reachable exits/NPCs, saves, combat turns, boss progression, guides and reports. They also verify that active combat does not call the paused calculus functions. Offline map/battle images have been inspected; browser layout and device testing remain outstanding.
+The automated checks cover exploration, reachable exits/NPCs, saves, combat turns, boss progression, guides and reports. They also verify that active combat does not call the paused calculus functions. Edge browser verification covers 1366 × 768 desktop and emulated 390 × 844 portrait and 844 × 390 landscape touch viewports. It covers route transitions, the level and Golem gate, victory from a fresh save, refresh in the Summit, and a second-finger NPC interaction. The automated browser run accelerated respawns and supplied center-timed strikes. Physical-device testing remains outstanding.
 
 The interface now lives inside the game screen: HUD, objectives, menus, battles and notifications. Village warmth and readable action feedback draw inspiration from Stardew Valley and Soul Knight while retaining Emberbrook’s own story and existing turn-based combat.
 
 The illustrated backdrop is in Emberbrook Village. An existing save can resume in another region. Open **Dev**, then choose **Emberbrook** under region warps to preview the village without resetting progress. Character names appear in the world and dialogue.
+
+Calculus handoff: the playable build still uses PrototypeCombat. The paused calculus draft, timing multipliers, level requirements and save format are preserved. After the group selects or lands the course mechanic, update the battle guide and verify the worked example against the actual in-game result.

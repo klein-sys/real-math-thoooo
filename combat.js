@@ -10,22 +10,25 @@ function renderBattleScene() {
   const scene=document.getElementById('battle-scene'),c=scene.getContext('2d'),w=scene.width,h=scene.height;
   c.imageSmoothingEnabled=false;
   const kind=currentMap().kind;
-  c.fillStyle=kind==='volcano'?'#301d2a':kind==='cave'?'#172431':'#1b3536';c.fillRect(0,0,w,h);
-  c.fillStyle=kind==='volcano'?'#703a36':kind==='cave'?'#344251':'#365643';
-  for(let i=0;i<9;i++) {
-    const x=i*90-20;
-    c.beginPath();c.moveTo(x,185);c.lineTo(x+55,35+(i%3)*20);c.lineTo(x+140,185);c.closePath();c.fill();
-  }
-  for(let x=0;x<w;x+=48)for(let y=185;y<h;y+=48) {
-    paintGround(c,kind,true,x,y,48);
-  }
-  c.fillStyle='#0c172455';c.fillRect(0,0,w,h);
+  paintBattleArena(c, kind, w, h, worldClock);
   const heroX=w*0.24,enemyX=w*0.76,ground=235;
   let heroState=battleVisual.heroUntil>worldClock?battleVisual.hero:'idle';
   let enemyState=battleVisual.enemyUntil>worldClock?battleVisual.enemy:'idle';
   if(activeBattle.enemyHp<=0)enemyState='death';
   const heroLunge=heroState==='attack'?Math.sin(Math.min(1,(worldClock-battleVisual.heroStart)/0.9)*Math.PI)*45:0;
   const enemyLunge=enemyState==='attack'?-Math.sin(Math.min(1,(worldClock-battleVisual.enemyStart)/0.9)*Math.PI)*30:0;
+  if(activeBattle.enemy.id==='dragon' && (activeBattle.enemyWarning || enemyState==='attack')) {
+    const striking=enemyState==='attack';
+    c.fillStyle=striking?'#e5753f80':'#d8924966';
+    c.fillRect(heroX-48,ground-16,96,32);
+    c.strokeStyle='#f4ac64';c.lineWidth=2;c.strokeRect(heroX-48,ground-16,96,32);
+    c.fillStyle='#ffe7a0';c.textAlign='center';c.font='bold 16px monospace';
+    c.fillText(striking?'FLAME STRIKE':'FLAME INCOMING',heroX,ground-115);
+    if(striking) {
+      polygon(c,'#dd633baf',[[enemyX-74,ground-54],[heroX+16,ground-27],[heroX-31,ground-9],[heroX+10,ground+6],[enemyX-73,ground-43]]);
+      polygon(c,'#ffce72',[[enemyX-83,ground-50],[heroX-10,ground-12],[heroX+17,ground-13]]);
+    }
+  }
   c.fillStyle='#06151a88';
   for(const x of [heroX,enemyX]){c.beginPath();c.ellipse(x,ground,48,11,0,0,Math.PI*2);c.fill();}
   drawCharacter(c,'hero',heroX+heroLunge,ground,100,heroState,false,worldClock-(battleVisual.heroStart||0));
@@ -60,7 +63,7 @@ function tryRun() {
     finishBattle('Escaped');
   } else {
     logBattle('Your escape was blocked! The enemy takes a turn.');
-    setTimeout(enemyTurn,800);
+    queueEnemyTurn(800);
   }
 }
 function finishBattle(outcome) {

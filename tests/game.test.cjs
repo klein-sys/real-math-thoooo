@@ -12,7 +12,7 @@ function boot(saves = {}, blocked = false) {
   const elements = new Map();
   const timers = [];
   const missingAssets = new Set();
-  const drawing = new Proxy({}, { get: (_, key) => key === 'measureText' ? () => ({ width: 20 }) : () => {} });
+  const drawing = new Proxy({}, { get: (_, key) => key === 'measureText' ? () => ({ width: 20 }) : key === 'createRadialGradient' ? () => ({addColorStop(){}}) : () => {} });
   function element(id = '') {
     return { id, style: {}, dataset: {}, listeners: {}, width: 768, height: 576, textContent: '', innerHTML: '',
       addEventListener(event, fn) { this.listeners[event] = fn; },

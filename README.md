@@ -6,7 +6,8 @@ A browser RPG for MATH 101, using a working title while the group develops the g
 
 Open `index.html` in a modern browser. Keep the JavaScript, CSS and `assets/game/` folders beside it. No install or build is needed to play.
 
-- **Move:** hold WASD / arrow keys, or drag the joystick. Movement is continuous, with diagonal movement, collision and a following camera.
+- **Map:** press M or choose Map to see your location, routes, and boss requirements.
+- **Move:** hold WASD / arrow keys, or drag the joystick on touch devices. Movement is continuous, with diagonal movement, collision and a following camera.
 - **Interact:** E / Space, the Action button or the nearby prompt. Walk through a marked doorway to enter or leave.
 - **Meet the Elder:** enter the blue-roofed house on the left.
 - **Heal and shop:** enter the blacksmith’s red-roofed house on the right.
@@ -29,6 +30,8 @@ Reach Level 3 before fighting the Golem. Defeat the Golem and reach Level 5 to e
 Hold Shift while moving to sprint. Open the marked supply caches in Emberbrook, Whispering Forest, and Stonebound Cavern for one potion and 15 gold each. Claimed caches stay open across saves.
 
 Emberbrook has an original illustrated map generated with ImageGen. Its layout follows the prompt for a warm woodland village with two distinct cottages, a central well, and a northbound path. The fullscreen HUD and battle panels share a warm brass and woodland palette.
+
+The forest has forked trails and a waystone, the cavern uses cool masonry and crystal light, and the summit has lava banks and a brazier-lit arena. On touch screens the camera shows at least ten tiles across. Desktop keyboard and mouse hide the touch overlays.
 
 ## Current design focus
 
